@@ -42,21 +42,21 @@ None.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LANG-01 | — | Pending |
-| LANG-02 | — | Pending |
-| BORD-01 | — | Pending |
-| BORD-02 | — | Pending |
-| BORD-03 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| COMP-04 | — | Pending |
-| COMP-05 | — | Pending |
+| LANG-01 | Phase 1 — Language Cascade | Pending |
+| LANG-02 | Phase 1 — Language Cascade | Pending |
+| BORD-01 | Phase 2 — Field Border UX | Pending |
+| BORD-02 | Phase 2 — Field Border UX | Pending |
+| BORD-03 | Phase 2 — Field Border UX | Pending |
+| COMP-01 | Phase 3 — Completion Page Cleanup | Pending |
+| COMP-02 | Phase 3 — Completion Page Cleanup | Pending |
+| COMP-03 | Phase 3 — Completion Page Cleanup | Pending |
+| COMP-04 | Phase 3 — Completion Page Cleanup | Pending |
+| COMP-05 | Phase 3 — Completion Page Cleanup | Pending |
 
 **Coverage:**
 - v1 requirements: 10 total
-- Mapped to phases: 0
-- Unmapped: 10 ⚠️
+- Mapped to phases: 10
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-19*
