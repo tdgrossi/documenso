@@ -38,11 +38,11 @@ Plans:
   2. Clearing a completed field reverts its border to the default color
   3. All field types (signature, date, text, initials, checkbox) consistently show grey border when completed
   4. Partially filled fields (e.g., text field mid-typing) do not show grey border until explicitly completed
-**Plans**: TBD
+**Plans**: 1 plan
 **UI hint**: yes
 
 Plans:
-- *(Plans to be defined during phase planning)*
+- [ ] 02-01-PLAN.md — Add `ring-neutral-400!` conditional class to FieldRootContainer + Playwright E2E for BORD-01/02/03 across all 5 field types + visual smoke test
 
 ### Phase 3: Completion Page Cleanup
 **Goal**: The post-signing page shows a minimal, branded success message with sender's identity
