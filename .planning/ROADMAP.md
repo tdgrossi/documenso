@@ -65,12 +65,13 @@ Plans:
   4. The page shows a clean success message with document status (signed/viewed/approved) and sender's logo
   5. The download button and "Go Back Home" link remain available for authenticated users
 
-**Plans**: 1 plan
+**Plans**: 2 plans
 **UI hint**: yes
 
 Plans:
 
-- [ ] 03-01-PLAN.md — Hide AuthenticatedHeader via hideHeader + remove sign-up panel + center layout
+- [ ] 03-01-PLAN.md — Hide AuthenticatedHeader via hideHeader + remove sign-up panel + center layout (COMP-02/03/04/05)
+- [ ] 03-02-PLAN.md — Display sender's logo from branding settings on completion page (COMP-01)
 
 ## Progress
 
