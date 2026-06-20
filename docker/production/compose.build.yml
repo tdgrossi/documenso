@@ -19,7 +19,7 @@ services:
 
   documenso:
     build:
-      context: ..
+      context: ../../
       dockerfile: docker/Dockerfile
       args:
         - NEXT_PRIVATE_ENCRYPTION_KEY=${NEXT_PRIVATE_ENCRYPTION_KEY:?err}
