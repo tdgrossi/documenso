@@ -84,4 +84,4 @@ services:
       - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
 
 volumes:
-  database:
+  documenso_postgresql_data:
