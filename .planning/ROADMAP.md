@@ -65,12 +65,12 @@ Plans:
   4. The page shows a clean success message with document status (signed/viewed/approved) and sender's logo
   5. The download button and "Go Back Home" link remain available for authenticated users
 
-**Plans**: TBD
+**Plans**: 1 plan
 **UI hint**: yes
 
 Plans:
 
-- *(Plans to be defined during phase planning)*
+- [ ] 03-01-PLAN.md — Hide AuthenticatedHeader via hideHeader + remove sign-up panel + center layout
 
 ## Progress
 
