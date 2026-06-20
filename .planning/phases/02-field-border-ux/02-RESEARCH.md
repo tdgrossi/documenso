@@ -468,17 +468,17 @@ The existing read-only field pattern (`recipient-colors.ts:23-35`) demonstrates 
 
 **If this table were empty:** All claims would be HIGH confidence. A2 is the only one with material risk and is best resolved by a screenshot smoke test before merge.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Visual acceptability on `DocumentReadOnlyFields` surfaces**
-   - What we know: The grey border will appear on 6 surfaces that show other recipients' completed fields
-   - What's unclear: Whether the visual change looks acceptable on document view pages (the most prominent of these)
-   - Recommendation: Include a visual smoke test in the plan (capture a screenshot of the document view page for a signed document). If the user finds it unacceptable, escalate to discuss-phase for D-03 refinement.
+1. **Visual acceptability on `DocumentReadOnlyFields` surfaces** — **RESOLVED**
+   - Resolution source: `02-CONTEXT.md` D-03 (locks `ring-neutral-400` as the "filled/done" shade) + D-08 (single integration point intentionally applies to all surfaces using `FieldRootContainer`, including `DocumentReadOnlyFields`).
+   - Plan disposition: `02-01-PLAN.md` Task 3 (`checkpoint:human-verify`) includes an explicit step (step 7) opening `http://localhost:3000/t/<teamUrl>/documents/<id>` for a completed document to visually confirm the grey border is acceptable against the document-view page chrome. If the user rejects the visual, the fallback is to scope the conditional via a new prop on `FieldRootContainer` (out of current plan scope; would require re-running discuss-phase to amend D-08).
+   - Status: ACCEPTED pending visual smoke test confirmation. Risk downgraded from MEDIUM to LOW with explicit user gate.
 
-2. **Should a default ring color (currently `ring-gray-200`) be replaced for ALL field types regardless of `inserted`?**
-   - What we know: The current default `ring-gray-200` was the "empty" affordance. With `ring-neutral-400` for completed, the two states now have meaningfully different colors.
-   - What's unclear: Whether the empty state needs a stronger differentiation too (e.g., `ring-gray-300` or `ring-gray-400`)
-   - Recommendation: No change — D-04 is explicit that default remains `ring-gray-200`. Out of scope.
+2. **Should a default ring color (currently `ring-gray-200`) be replaced for ALL field types regardless of `inserted`?** — **RESOLVED**
+   - Resolution source: `02-CONTEXT.md` D-04 (explicit lock: "default border is `ring-gray-200`; completed border upgrades to `ring-neutral-400`").
+   - Plan disposition: No change to the default state. `02-01-PLAN.md` Task 1 includes an explicit constraint "Do NOT touch `FIELD_ROOT_CONTAINER_CLASS_NAME`" to enforce D-04. The differentiation is two-state (`gray-200` ↔ `neutral-400`), which is sufficient per the user-locked decision.
+   - Status: CLOSED — D-04 binds the answer; no further planning work.
 
 ## Environment Availability
 

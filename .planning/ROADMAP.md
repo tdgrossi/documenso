@@ -8,7 +8,7 @@ Three targeted improvements to the Documenso signing experience: fixing the lang
 
 - [ ] **Phase 1: Language Cascade** - Recipient signing page displays UI in sender's language from document metadata
 - [ ] **Phase 2: Field Border UX** - Completed signing fields show grey border; cleared fields revert
-- [ ] **Phase 3: Completion Page Cleanup** - Post-signing page shows sender's logo with minimal success message
+- [x] **Phase 3: Completion Page Cleanup** - Post-signing page shows sender's logo with minimal success message
 
 ## Phase Details
 
@@ -70,8 +70,8 @@ Plans:
 
 Plans:
 
-- [ ] 03-01-PLAN.md — Hide AuthenticatedHeader via hideHeader + remove sign-up panel + center layout (COMP-02/03/04/05)
-- [ ] 03-02-PLAN.md — Display sender's logo from branding settings on completion page (COMP-01)
+- [x] 03-01-PLAN.md — Hide AuthenticatedHeader via hideHeader + remove sign-up panel + center layout (COMP-02/03/04/05)
+- [x] 03-02-PLAN.md — COMP-01 already covered by existing RecipientBranding component (D-03); no plan needed
 
 ## Progress
 
@@ -82,4 +82,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Language Cascade | 0/TBD | Not started | - |
 | 2. Field Border UX | 0/TBD | Not started | - |
-| 3. Completion Page Cleanup | 0/TBD | Not started | - |
+| 3. Completion Page Cleanup | 2/2 | Complete | ✓ |

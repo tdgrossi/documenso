@@ -9,6 +9,7 @@ import { readCscServiceSessionFromRequest } from '@documenso/ee/server-only/sign
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { IS_INSTANCE_CSC_MODE } from '@documenso/lib/constants/app';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { loadRecipientBrandingByTeamId } from '@documenso/lib/server-only/branding/load-recipient-branding';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -27,12 +28,14 @@ import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-emai
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { isTspEnvelope } from '@documenso/lib/types/signature-level';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { isRecipientExpired } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { Trans } from '@lingui/react/macro';
 import { DocumentSigningOrder, DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import { Clock8 } from 'lucide-react';
+import { useEffect } from 'react';
 import { Link, redirect } from 'react-router';
 import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
@@ -47,6 +50,7 @@ import { DocumentSigningPageViewV2 } from '~/components/general/document-signing
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
 import { EnvelopeSigningProvider } from '~/components/general/document-signing/envelope-signing-provider';
 import { RecipientBranding } from '~/components/general/recipient-branding';
+import { langCookie } from '~/storage/lang-cookie.server';
 import { useCspNonce } from '~/utils/nonce';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
@@ -363,8 +367,21 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
     // the `superLoaderJson` response init so the browser actually applies the
     // header. The field stays on the payload — it's just a `Max-Age=0` clear
     // directive, not sensitive — and isn't read by any consumer.
-    const responseHeaders =
-      'responseHeaders' in payloadV2 && payloadV2.responseHeaders ? payloadV2.responseHeaders : undefined;
+    const headersInit: [string, string][] = [];
+
+    if ('responseHeaders' in payloadV2 && payloadV2.responseHeaders) {
+      for (const [key, value] of Object.entries(payloadV2.responseHeaders)) {
+        headersInit.push([key, value]);
+      }
+    }
+
+    if (payloadV2.isDocumentAccessValid && 'envelopeForSigning' in payloadV2 && payloadV2.envelopeForSigning) {
+      const language = payloadV2.envelopeForSigning.envelope.documentMeta.language;
+
+      if (language) {
+        headersInit.push(['Set-Cookie', await langCookie.serialize(language)]);
+      }
+    }
 
     return superLoaderJson(
       {
@@ -372,17 +389,30 @@ export async function loader(loaderArgs: Route.LoaderArgs) {
         payload: payloadV2,
         branding,
       } as const,
-      responseHeaders ? { headers: responseHeaders } : undefined,
+      headersInit.length > 0 ? { headers: headersInit } : undefined,
     );
   }
 
   const payloadV1 = await handleV1Loader(loaderArgs);
 
-  return superLoaderJson({
-    version: 1,
-    payload: payloadV1,
-    branding,
-  } as const);
+  const v1Headers: [string, string][] = [];
+
+  if (payloadV1.isDocumentAccessValid && 'document' in payloadV1 && payloadV1.document) {
+    const language = payloadV1.document.documentMeta?.language;
+
+    if (language) {
+      v1Headers.push(['Set-Cookie', await langCookie.serialize(language)]);
+    }
+  }
+
+  return superLoaderJson(
+    {
+      version: 1,
+      payload: payloadV1,
+      branding,
+    } as const,
+    v1Headers.length > 0 ? { headers: v1Headers } : undefined,
+  );
 }
 
 export default function SigningPage() {
@@ -401,6 +431,18 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
   const { sessionData } = useOptionalSession();
 
   const user = sessionData?.user;
+
+  useEffect(() => {
+    if (
+      data.isDocumentAccessValid &&
+      'document' in data &&
+      data.document?.documentMeta?.language &&
+      data.document.documentMeta.language !== APP_I18N_OPTIONS.sourceLang
+    ) {
+      void dynamicActivate(data.document.documentMeta.language);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!data.isDocumentAccessValid) {
     return <DocumentSigningAuthPageView email={data.recipientEmail} emailHasAccount={!!data.recipientHasAccount} />;
@@ -498,6 +540,17 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
 const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loader>> }) => {
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
+
+  useEffect(() => {
+    if (data.isDocumentAccessValid && 'envelopeForSigning' in data && data.envelopeForSigning) {
+      const language = data.envelopeForSigning.envelope.documentMeta.language;
+
+      if (language && language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(language);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!data.isDocumentAccessValid) {
     return <DocumentSigningAuthPageView email={data.recipientEmail} emailHasAccount={!!data.recipientHasAccount} />;
