@@ -58,7 +58,9 @@ export const upsertFieldRect = (field: FieldToRender, options: RenderFieldElemen
     width: fieldWidth,
     height: fieldHeight,
     fill: fieldCanvasStyle?.backgroundColor ?? DEFAULT_RECT_BACKGROUND,
-    stroke: fieldCanvasStyle?.borderColor ?? (color ? getRecipientColorStyles(color).baseRing : '#e5e7eb'),
+    stroke: field.inserted
+      ? getRecipientColorStyles('readOnly').baseRing
+      : (fieldCanvasStyle?.borderColor ?? (color ? getRecipientColorStyles(color).baseRing : '#e5e7eb')),
     strokeWidth: fieldCanvasStyle?.borderWidth ?? 2,
     cornerRadius: fieldCanvasStyle?.borderRadius ?? 2,
     strokeScaleEnabled: false,

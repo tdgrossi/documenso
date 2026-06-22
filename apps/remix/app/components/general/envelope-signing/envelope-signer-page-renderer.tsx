@@ -152,7 +152,8 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
 
     const isValidating = showPendingFieldTooltip && isFieldUnsignedAndRequired(fieldToRender);
 
-    const color = fieldToRender.fieldMeta?.readOnly ? 'readOnly' : isValidating ? 'orange' : 'green';
+    const color =
+      fieldToRender.fieldMeta?.readOnly || fieldToRender.inserted ? 'readOnly' : isValidating ? 'orange' : 'green';
 
     const { fieldGroup } = renderField({
       scale,
@@ -520,7 +521,7 @@ export const EnvelopeSignerPageRenderer = ({ pageData }: { pageData: PageRenderD
   /**
    * Initialize the Konva page canvas and all fields and interactions.
    */
-  const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
+  const createPageCanvas = (_currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     renderFields();
     currentPageLayer.batchDraw();
   };
