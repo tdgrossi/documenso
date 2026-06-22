@@ -86,7 +86,10 @@ A previous debug cycle concluded that the `!` modifier must be a prefix. The fix
 - The `!important` on `!ring-neutral-400` should override this, but there may be browser-specific cascade issues with CSS variables + `!important`
 - V1 issue is SEPARATE from V2 — V1 uses React rendering where the CSS class approach should work
 
-## E12: FIXES APPLIED
+## E12: USER CONFIRMED FIX WORKING
+- timestamp: 2026-06-22 — User confirmed on V2 envelope signing page (`/d/hn7V5xiNEpAizlq0sfRtB`, internalVersion: 2) that the grey border now appears on completed fields. The Konva canvas fix (color='readOnly' when inserted + explicit neutral-400 stroke) resolved the issue.
+
+## E13: FIXES APPLIED
 - timestamp: 2026-06-22 — `envelope-signer-page-renderer.tsx:155`: Changed color to use `'readOnly'` when `fieldToRender.inserted === true`
   - Before: `fieldToRender.fieldMeta?.readOnly ? 'readOnly' : isValidating ? 'orange' : 'green'`
   - After: `fieldToRender.fieldMeta?.readOnly || fieldToRender.inserted ? 'readOnly' : isValidating ? 'orange' : 'green'`

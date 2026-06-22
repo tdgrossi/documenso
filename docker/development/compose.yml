@@ -7,7 +7,7 @@ services:
     volumes:
       - documenso_database:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      test: ['CMD-SHELL', 'pg_isready -U documenso']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -16,7 +16,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=documenso
     ports:
-      - 54320:5432
+      - 5440:5432
 
   inbucket:
     image: inbucket/inbucket
