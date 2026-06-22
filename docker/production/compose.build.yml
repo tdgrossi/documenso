@@ -1,5 +1,6 @@
 name: documenso-production
-
+volumes:                                                                                                                                                                              
+    documenso_postgresql_data: 
 services:
   database:
     image: 'postgres:17'
