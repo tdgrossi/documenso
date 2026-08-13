@@ -22,6 +22,7 @@ services:
     build:
       context: ../../
       dockerfile: docker/Dockerfile
+      no-cache: true
       args:
         - NEXT_PRIVATE_ENCRYPTION_KEY=${NEXT_PRIVATE_ENCRYPTION_KEY:?err}
         - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:?err}

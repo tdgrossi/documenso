@@ -81,6 +81,8 @@ Contact us if you are interested in our Enterprise plan for large organizations 
   <a href=""><img src="" alt=""></a>
 </p>
 
+Email: example@documenso.com Password: password
+
 - [Typescript](https://www.typescriptlang.org/) - Language
 - [ReactRouter](https://reactrouter.com/) - Framework
 - [Prisma](https://www.prisma.io/) - ORM
