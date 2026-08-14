@@ -147,7 +147,7 @@ export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
       }),
     )
     .optional(),
-  direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
+  direction: z.enum(['vertical', 'horizontal', 'grid']).optional().default('vertical'),
 });
 
 export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
@@ -165,7 +165,7 @@ export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
     .optional(),
   validationRule: z.string().optional(),
   validationLength: z.number().optional(),
-  direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
+  direction: z.enum(['vertical', 'horizontal', 'grid']).optional().default('vertical'),
 });
 
 export type TCheckboxFieldMeta = z.infer<typeof ZCheckboxFieldMeta>;

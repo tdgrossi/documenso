@@ -255,7 +255,11 @@ export const DocumentSigningCheckboxField = ({
           <div
             className={cn(
               'z-50 my-0.5 flex gap-1',
-              parsedFieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+              parsedFieldMeta.direction === 'horizontal'
+                ? 'flex-row flex-wrap'
+                : parsedFieldMeta.direction === 'grid'
+                  ? 'grid grid-cols-2 gap-1'
+                  : 'flex-col gap-y-1',
             )}
           >
             {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
@@ -289,7 +293,11 @@ export const DocumentSigningCheckboxField = ({
         <div
           className={cn(
             'my-0.5 flex gap-1',
-            parsedFieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+            parsedFieldMeta.direction === 'horizontal'
+              ? 'flex-row flex-wrap'
+              : parsedFieldMeta.direction === 'grid'
+                ? 'grid grid-cols-2 gap-1'
+                : 'flex-col gap-y-1',
           )}
         >
           {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {

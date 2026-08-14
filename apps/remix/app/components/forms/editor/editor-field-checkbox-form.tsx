@@ -176,6 +176,9 @@ export const EditorFieldCheckboxForm = ({
                       <SelectItem value="horizontal">
                         <Trans>Horizontal</Trans>
                       </SelectItem>
+                      <SelectItem value="grid">
+                        <Trans>Grid</Trans>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

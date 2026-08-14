@@ -53,7 +53,11 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
         <div
           className={cn(
             'flex gap-1 py-0.5',
-            field.fieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+            field.fieldMeta.direction === 'horizontal'
+              ? 'flex-row flex-wrap'
+              : field.fieldMeta.direction === 'grid'
+                ? 'grid grid-cols-2 gap-1'
+                : 'flex-col gap-y-1',
           )}
         >
           <div className="flex items-center">
@@ -70,7 +74,11 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
       <div
         className={cn(
           'flex gap-1 py-0.5',
-          field.fieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+          field.fieldMeta.direction === 'horizontal'
+            ? 'flex-row flex-wrap'
+            : field.fieldMeta.direction === 'grid'
+              ? 'grid grid-cols-2 gap-1'
+              : 'flex-col gap-y-1',
         )}
       >
         {field.fieldMeta.values.map((item, index) => (

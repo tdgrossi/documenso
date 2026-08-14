@@ -131,7 +131,7 @@ type CalculateMultiItemPositionOptions = {
   /**
    * The direction of the items.
    */
-  direction: 'horizontal' | 'vertical';
+  direction: 'horizontal' | 'vertical' | 'grid';
 
   type: 'checkbox' | 'radio';
 };
@@ -177,6 +177,43 @@ export const calculateMultiItemPosition = (options: CalculateMultiItemPositionOp
     const textY = y;
 
     // Multiplied by 2 for extra padding on the right hand side of the text and the next item.
+    const textWidth = itemWidth - itemSize - spacingBetweenItemAndText * 2;
+    const textHeight = itemHeight;
+
+    return {
+      itemInputX,
+      itemInputY,
+      textX,
+      textY,
+      textWidth,
+      textHeight,
+    };
+  }
+
+  if (direction === 'grid') {
+    const numColumns = Math.ceil(Math.sqrt(itemCount));
+    const numRows = Math.ceil(itemCount / numColumns);
+
+    const itemWidth = innerFieldWidth / numColumns;
+    const itemHeight = innerFieldHeight / numRows;
+
+    const col = itemIndex % numColumns;
+    const row = Math.floor(itemIndex / numColumns);
+
+    const x = col * itemWidth + innerFieldX;
+    const y = row * itemHeight + innerFieldY;
+
+    let itemInputY = y + itemHeight / 2 - itemSize / 2;
+    let itemInputX = x;
+
+    // We need a little different logic to center the radio circle icon.
+    if (type === 'radio') {
+      itemInputX = x + itemSize / 2;
+      itemInputY = y + itemHeight / 2;
+    }
+
+    const textX = x + itemSize + spacingBetweenItemAndText;
+    const textY = y;
     const textWidth = itemWidth - itemSize - spacingBetweenItemAndText * 2;
     const textHeight = itemHeight;
 

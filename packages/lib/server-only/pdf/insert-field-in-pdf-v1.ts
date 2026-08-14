@@ -272,6 +272,48 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
 
           currentX += itemWidth;
         }
+      } else if (direction === 'grid') {
+        // Grid layout: arrange checkboxes in a grid with even distribution
+        const itemCount = values?.length ?? 0;
+        const numColumns = Math.ceil(Math.sqrt(itemCount));
+        const numRows = Math.ceil(itemCount / numColumns);
+
+        const fieldWidth = pageWidth * (Number(field.width) / 100);
+        const fieldHeight = pageHeight * (Number(field.height) / 100);
+        const innerWidth = fieldWidth - leftCheckboxPadding * 2;
+        const itemWidth = innerWidth / numColumns;
+        const itemHeight = (fieldHeight - topPadding * 2) / numRows;
+
+        for (const [index, item] of (values ?? []).entries()) {
+          const col = index % numColumns;
+          const row = Math.floor(index / numColumns);
+
+          const offsetX = col * itemWidth + leftCheckboxPadding;
+          const offsetY = row * itemHeight + topPadding;
+
+          const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
+
+          if (selected.includes(item.value)) {
+            checkbox.check();
+          }
+
+          const labelText = item.value.includes('empty-value-') ? '' : item.value;
+
+          page.drawText(labelText, {
+            x: fieldX + offsetX + leftCheckboxLabelPadding,
+            y: pageHeight - (fieldY + offsetY),
+            size: 12,
+            font,
+            rotate: degrees(pageRotationInDegrees),
+          });
+
+          checkbox.addToPage(page, {
+            x: fieldX + offsetX,
+            y: pageHeight - (fieldY + offsetY),
+            height: 8,
+            width: 8,
+          });
+        }
       } else {
         // Vertical layout: original behavior
         for (const [index, item] of (values ?? []).entries()) {

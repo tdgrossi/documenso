@@ -36,14 +36,22 @@ export const CheckboxFieldAdvancedSettings = ({
   const [required, setRequired] = useState(fieldState.required ?? false);
   const [validationLength, setValidationLength] = useState(fieldState.validationLength ?? 0);
   const [validationRule, setValidationRule] = useState(fieldState.validationRule ?? '');
-  const [direction, setDirection] = useState<'vertical' | 'horizontal'>(fieldState.direction ?? 'vertical');
+  const [direction, setDirection] = useState<'vertical' | 'horizontal' | 'grid'>(fieldState.direction ?? 'vertical');
 
-  const handleToggleChange = (field: keyof CheckboxFieldMeta, value: string | boolean) => {
+  const handleToggleChange = (
+    field: keyof CheckboxFieldMeta,
+    value: string | { checked: boolean; value: string }[] | boolean,
+  ) => {
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
     const validationRule = field === 'validationRule' ? String(value) : String(fieldState.validationRule);
     const validationLength = field === 'validationLength' ? Number(value) : Number(fieldState.validationLength);
-    const currentDirection = field === 'direction' && String(value) === 'horizontal' ? 'horizontal' : 'vertical';
+    const currentDirection =
+      field === 'direction'
+        ? ['horizontal', 'vertical', 'grid'].includes(String(value))
+          ? (String(value) as 'vertical' | 'horizontal' | 'grid')
+          : 'vertical'
+        : direction;
 
     setReadOnly(readOnly);
     setRequired(required);
@@ -148,6 +156,9 @@ export const CheckboxFieldAdvancedSettings = ({
             </SelectItem>
             <SelectItem value="horizontal">
               <Trans>Horizontal</Trans>
+            </SelectItem>
+            <SelectItem value="grid">
+              <Trans>Grid</Trans>
             </SelectItem>
           </SelectContent>
         </Select>
