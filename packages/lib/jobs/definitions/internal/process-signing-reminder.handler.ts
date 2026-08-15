@@ -1,8 +1,8 @@
 import DocumentReminderEmailTemplate from '@documenso/email/templates/document-reminder';
 import { prisma } from '@documenso/prisma';
+import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
 import { msg } from '@lingui/core/macro';
 import {
-  DocumentDistributionMethod,
   DocumentStatus,
   OrganisationType,
   RecipientRole,

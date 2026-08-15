@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
-import { DocumentDistributionMethod, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
+import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 import { resolveNextReminderAt, ZEnvelopeReminderSettings } from '../../constants/envelope-reminder';
 

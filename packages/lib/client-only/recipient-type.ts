@@ -1,5 +1,6 @@
+import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
 import type { Recipient } from '@prisma/client';
-import { DocumentDistributionMethod, ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import { ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 type RecipientForType = Pick<Recipient, 'role' | 'signingStatus' | 'readStatus' | 'sendStatus'>;
 

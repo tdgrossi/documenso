@@ -1,7 +1,8 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
 import { expect, type Page, test } from '@playwright/test';
-import { DocumentDistributionMethod, DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility } from '@prisma/client';
 
 import {
   getEnvelopeEditorSettingsTrigger,

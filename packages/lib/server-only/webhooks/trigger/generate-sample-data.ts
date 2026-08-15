@@ -1,5 +1,5 @@
+import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
 import {
-  DocumentDistributionMethod,
   DocumentSigningOrder,
   DocumentSource,
   DocumentStatus,

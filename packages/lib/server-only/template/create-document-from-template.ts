@@ -1,6 +1,7 @@
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import type { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
+import type { DocumentSigningOrder } from '@prisma/client';
 import {
   DocumentSource,
   EnvelopeType,

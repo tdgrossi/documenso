@@ -1,5 +1,6 @@
+import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
 import type { DocumentMeta, Envelope, OrganisationGlobalSettings, Recipient, Team, User } from '@prisma/client';
-import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
+import { DocumentStatus } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
 import { resolveSigningOrder } from '../server-only/signature-level/resolve-signing-order';
