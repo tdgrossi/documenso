@@ -1,9 +1,8 @@
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
 
 export const ZUpdatePasskeyRequestSchema = z.object({
   passkeyId: z.string().trim().min(1),
-  name: ZNameSchema,
+  name: z.string().trim().min(1),
 });
 
 export const ZUpdatePasskeyResponseSchema = z.void();

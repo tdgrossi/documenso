@@ -11,10 +11,10 @@ import { DownloadIcon } from 'lucide-react';
 
 export type DocumentAuditLogDownloadButtonProps = {
   className?: string;
-  envelopeId: string;
+  documentId: number;
 };
 
-export const DocumentAuditLogDownloadButton = ({ className, envelopeId }: DocumentAuditLogDownloadButtonProps) => {
+export const DocumentAuditLogDownloadButton = ({ className, documentId }: DocumentAuditLogDownloadButtonProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
 
@@ -22,7 +22,7 @@ export const DocumentAuditLogDownloadButton = ({ className, envelopeId }: Docume
 
   const onDownloadAuditLogsClick = async () => {
     try {
-      const { data, envelopeTitle } = await downloadAuditLogs({ envelopeId });
+      const { data, envelopeTitle } = await downloadAuditLogs({ documentId });
 
       const buffer = new Uint8Array(base64.decode(data));
       const blob = new Blob([buffer], { type: 'application/pdf' });

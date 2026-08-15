@@ -1,7 +1,6 @@
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
@@ -20,6 +19,7 @@ import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
+
 import { SIGNUP_ERROR_MESSAGES } from '~/components/forms/signup';
 
 export type ClaimAccountProps = {
@@ -30,7 +30,7 @@ export type ClaimAccountProps = {
 
 export const ZClaimAccountFormSchema = z
   .object({
-    name: ZNameSchema,
+    name: z.string().trim().min(1, { message: msg`Please enter a valid name.`.id }),
     email: zEmail().min(1),
     password: ZPasswordSchema,
   })

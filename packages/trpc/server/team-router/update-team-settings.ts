@@ -42,6 +42,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
 
       // Branding related settings.
       brandingEnabled,
+      brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
       brandingColors,
@@ -124,10 +125,11 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     const isChangingIncludeSenderDetails =
       includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
 
-    // Personal teams cannot change the sender details — drop the field (no-op)
-    // instead of rejecting the whole update.
-    const derivedIncludeSenderDetails =
-      isPersonalOrganisation && isChangingIncludeSenderDetails ? undefined : includeSenderDetails;
+    if (isPersonalOrganisation && isChangingIncludeSenderDetails) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Personal teams cannot update the sender details',
+      });
+    }
 
     // Sanitize custom branding CSS at write time. `null` means inherit-from-org
     // for teams, so only run the sanitiser when an explicit string is provided.
@@ -162,7 +164,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             documentLanguage,
             documentTimezone,
             documentDateFormat,
-            includeSenderDetails: derivedIncludeSenderDetails,
+            includeSenderDetails,
             includeSigningCertificate,
             includeAuditLog,
             typedSignatureEnabled,
@@ -174,6 +176,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
 
             // Branding related settings.
             brandingEnabled,
+            brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
             brandingColors: normalizedBrandingColors === null ? Prisma.DbNull : normalizedBrandingColors,

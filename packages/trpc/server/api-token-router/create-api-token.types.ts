@@ -1,9 +1,8 @@
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { z } from 'zod';
 
 export const ZCreateApiTokenRequestSchema = z.object({
   teamId: z.number(),
-  tokenName: ZNameSchema,
+  tokenName: z.string().min(3, { message: 'The token name should be 3 characters or longer' }),
   expirationDate: z.string().nullable(),
 });
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZDownloadDocumentCertificateRequestSchema = z.object({
-  envelopeId: z.string(),
+  documentId: z.number(),
 });
 
 export const ZDownloadDocumentCertificateResponseSchema = z.object({

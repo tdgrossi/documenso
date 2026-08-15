@@ -3,6 +3,7 @@ import type { TeamProfile } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { updateTeamPublicProfile } from './update-team-public-profile';
 
 export type GetTeamPublicProfileOptions = {
   userId: number;
@@ -31,24 +32,25 @@ export const getTeamPublicProfile = async ({
     });
   }
 
-  // Lazily initialize a disabled public profile on first access. Membership is
-  // already verified by the query above, so this system initialization does not
-  // impose the MANAGE_TEAM gate that updateTeamPublicProfile enforces for writes.
+  // Create and return the public profile.
   if (!team.profile) {
-    const profile = await prisma.teamProfile.upsert({
-      where: {
-        teamId,
-      },
-      create: {
-        teamId,
+    const { url, profile } = await updateTeamPublicProfile({
+      userId: userId,
+      teamId,
+      data: {
         enabled: false,
       },
-      update: {},
     });
+
+    if (!profile) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Failed to create public profile',
+      });
+    }
 
     return {
       profile,
-      url: team.url,
+      url,
     };
   }
 

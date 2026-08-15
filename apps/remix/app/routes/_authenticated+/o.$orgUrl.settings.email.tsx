@@ -27,7 +27,7 @@ export default function OrganisationSettingsGeneral() {
 
   const onEmailPreferencesSubmit = async (data: TEmailPreferencesFormSchema) => {
     try {
-      const { emailId, emailReplyTo, emailDocumentSettings, includeSenderDetails } = data;
+      const { emailId, emailReplyTo, emailDocumentSettings } = data;
 
       await updateOrganisationSettings({
         organisationId: organisation.id,
@@ -36,7 +36,6 @@ export default function OrganisationSettingsGeneral() {
           emailReplyTo: emailReplyTo || null,
           // emailReplyToName,
           emailDocumentSettings,
-          includeSenderDetails: includeSenderDetails ?? undefined,
         },
       });
 
@@ -50,8 +49,6 @@ export default function OrganisationSettingsGeneral() {
         description: t`We were unable to update your email preferences at this time, please try again later`,
         variant: 'destructive',
       });
-
-      throw err;
     }
   };
 
@@ -60,7 +57,7 @@ export default function OrganisationSettingsGeneral() {
   }
 
   return (
-    <div>
+    <div className="max-w-2xl">
       <SettingsHeader title={t`Email Preferences`} subtitle={t`You can manage your email preferences here.`} />
 
       <section>

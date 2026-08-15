@@ -29,7 +29,7 @@ export type DocumentsTableProps = {
   data?: TFindDocumentsResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
-  onMoveDocument?: (envelopeId: string) => void;
+  onMoveDocument?: (documentId: number) => void;
   enableSelection?: boolean;
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: (selection: RowSelectionState) => void;
@@ -117,7 +117,7 @@ export const DocumentsTable = ({
               <DocumentsTableActionButton row={row.original} />
               <DocumentsTableActionDropdown
                 row={row.original}
-                onMoveDocument={onMoveDocument ? () => onMoveDocument(row.original.envelopeId) : undefined}
+                onMoveDocument={onMoveDocument ? () => onMoveDocument(row.original.id) : undefined}
               />
             </div>
           ),

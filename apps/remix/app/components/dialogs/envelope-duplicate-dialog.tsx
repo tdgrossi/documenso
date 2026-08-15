@@ -1,7 +1,6 @@
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogClose,
@@ -12,12 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { useCurrentTeam } from '~/providers/team';
@@ -40,15 +37,6 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
 
   const isDocument = envelopeType === EnvelopeType.DOCUMENT;
 
-  const form = useForm({
-    defaultValues: {
-      includeRecipients: true,
-      includeFields: true,
-    },
-  });
-
-  const includeRecipients = form.watch('includeRecipients');
-
   const { mutateAsync: duplicateEnvelope, isPending: isDuplicating } = trpc.envelope.duplicate.useMutation({
     onSuccess: async ({ id }) => {
       toast({
@@ -67,14 +55,8 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
   });
 
   const onDuplicate = async () => {
-    const { includeRecipients, includeFields } = form.getValues();
-
     try {
-      await duplicateEnvelope({
-        envelopeId,
-        includeRecipients,
-        includeFields: includeRecipients && includeFields,
-      });
+      await duplicateEnvelope({ envelopeId });
     } catch {
       toast({
         title: t`Something went wrong`,
@@ -88,20 +70,7 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(value) => {
-        if (isDuplicating) {
-          return;
-        }
-
-        setOpen(value);
-
-        if (!value) {
-          form.reset();
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={(value) => !isDuplicating && setOpen(value)}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent>
@@ -117,49 +86,6 @@ export const EnvelopeDuplicateDialog = ({ envelopeId, envelopeType, trigger }: E
             )}
           </DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4">
-          <Controller
-            control={form.control}
-            name="includeRecipients"
-            render={({ field }) => (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="envelopeDuplicateIncludeRecipients"
-                  checked={field.value}
-                  onCheckedChange={(checked) => {
-                    field.onChange(checked === true);
-
-                    if (!checked) {
-                      form.setValue('includeFields', false);
-                    }
-                  }}
-                />
-                <Label htmlFor="envelopeDuplicateIncludeRecipients">
-                  <Trans>Include Recipients</Trans>
-                </Label>
-              </div>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="includeFields"
-            render={({ field }) => (
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="envelopeDuplicateIncludeFields"
-                  checked={field.value}
-                  disabled={!includeRecipients}
-                  onCheckedChange={(checked) => field.onChange(checked === true)}
-                />
-                <Label htmlFor="envelopeDuplicateIncludeFields" className={!includeRecipients ? 'opacity-50' : ''}>
-                  <Trans>Include Fields</Trans>
-                </Label>
-              </div>
-            )}
-          />
-        </div>
 
         <DialogFooter>
           <DialogClose asChild>

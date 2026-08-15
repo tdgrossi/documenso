@@ -46,9 +46,7 @@ export interface HonoEnv {
   };
 }
 
-const basePath = (env('NEXT_PUBLIC_BASE_PATH') ?? '').replace(/\/$/, '');
-
-const app = new Hono<HonoEnv>().basePath(basePath || '/');
+const app = new Hono<HonoEnv>();
 
 /**
  * Database-backed rate limiting for API routes.
@@ -107,6 +105,7 @@ app.route('/api/auth', auth);
 
 // Files route.
 app.use('/api/files/upload-pdf', fileRateLimitMiddleware);
+app.use('/api/files/presigned-post-url', fileRateLimitMiddleware);
 app.route('/api/files', filesRoute);
 
 // AI route.

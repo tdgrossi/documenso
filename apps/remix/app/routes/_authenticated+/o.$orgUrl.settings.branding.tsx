@@ -1,6 +1,8 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED, IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import type { SanitizeBrandingCssWarning } from '@documenso/lib/utils/sanitize-branding-css';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -17,7 +19,6 @@ import {
   type TBrandingPreferencesFormSchema,
 } from '~/components/forms/branding-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { BrandingUpsell } from '~/components/general/settings-upsell/branding-upsell';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -26,11 +27,15 @@ export function meta() {
 }
 
 export default function OrganisationSettingsBrandingPage() {
+  const { organisations } = useSession();
+
   const organisation = useCurrentOrganisation();
   const team = useOptionalCurrentTeam();
 
   const { t } = useLingui();
   const { toast } = useToast();
+
+  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const [cssWarnings, setCssWarnings] = useState<SanitizeBrandingCssWarning[]>([]);
 
@@ -44,29 +49,26 @@ export default function OrganisationSettingsBrandingPage() {
 
   const { mutateAsync: updateOrganisationSettings } = trpc.organisation.settings.update.useMutation();
 
-  const { mutateAsync: updateOrganisationBrandingLogo } = trpc.organisation.settings.updateBrandingLogo.useMutation();
-
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
       const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails, brandingColors, brandingCss } = data;
 
-      // Upload (or clear) the logo through the dedicated, server-validated route.
-      if (brandingLogo instanceof File || brandingLogo === null) {
-        const formData = new FormData();
+      let uploadedBrandingLogo: string | undefined;
 
-        formData.append('payload', JSON.stringify({ organisationId: organisation.id }));
+      if (brandingLogo) {
+        uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
+      }
 
-        if (brandingLogo instanceof File) {
-          formData.append('brandingLogo', brandingLogo);
-        }
-
-        await updateOrganisationBrandingLogo(formData);
+      // Empty the branding logo if the user unsets it.
+      if (brandingLogo === null) {
+        uploadedBrandingLogo = '';
       }
 
       const result = await updateOrganisationSettings({
         organisationId: organisation.id,
         data: {
           brandingEnabled: brandingEnabled ?? undefined,
+          brandingLogo: uploadedBrandingLogo,
           brandingUrl,
           brandingCompanyDetails,
           brandingColors,
@@ -102,9 +104,6 @@ export default function OrganisationSettingsBrandingPage() {
         description: t`We were unable to update your branding preferences at this time, please try again later`,
         variant: 'destructive',
       });
-
-      // Rethrow so the form knows the save failed and keeps the unsaved changes.
-      throw err;
     }
   };
 
@@ -118,22 +117,17 @@ export default function OrganisationSettingsBrandingPage() {
 
   const settingsHeaderText = t`Branding Preferences`;
 
-  const settingsHeaderSubtitle = team
-    ? t`Here you can set branding preferences for your team.`
-    : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
-
-  const brandingPreferencesFormEnabled =
-    organisationWithSettings.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED();
+  const settingsHeaderSubtitle = isPersonalLayoutMode
+    ? t`Here you can set your general branding preferences.`
+    : team
+      ? t`Here you can set branding preferences for your team.`
+      : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (
-    <div>
-      <SettingsHeader
-        title={settingsHeaderText}
-        subtitle={settingsHeaderSubtitle}
-        hideDivider={!brandingPreferencesFormEnabled}
-      />
+    <div className="max-w-2xl">
+      <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
 
-      {brandingPreferencesFormEnabled ? (
+      {organisationWithSettings.organisationClaim.flags.allowCustomBranding || !IS_BILLING_ENABLED() ? (
         <section>
           <BrandingPreferencesForm
             context="Organisation"
@@ -168,8 +162,6 @@ export default function OrganisationSettingsBrandingPage() {
             </Alert>
           )}
         </section>
-      ) : IS_DOCUMENSO_CLOUD() ? (
-        <BrandingUpsell />
       ) : (
         <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
           <div className="mb-4 sm:mb-0">
@@ -184,7 +176,7 @@ export default function OrganisationSettingsBrandingPage() {
 
           {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
             <Button asChild variant="outline">
-              <Link to={`/o/${organisation.url}/settings/billing`}>
+              <Link to={isPersonalLayoutMode ? '/settings/billing' : `/o/${organisation.url}/settings/billing`}>
                 <Trans>Update Billing</Trans>
               </Link>
             </Button>

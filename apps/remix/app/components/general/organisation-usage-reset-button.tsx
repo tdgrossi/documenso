@@ -2,7 +2,6 @@ import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { RotateCcwIcon } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
 type OrganisationUsageResetButtonProps = {
@@ -33,7 +32,6 @@ export const OrganisationUsageResetButton = ({ organisationId, counter }: Organi
       loading={isPending}
       onClick={() => reset({ organisationId, counter })}
     >
-      <RotateCcwIcon className="mr-2 h-3.5 w-3.5" />
       <Trans>Reset</Trans>
     </Button>
   );

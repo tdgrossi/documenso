@@ -1,4 +1,3 @@
-import type { EmailBrandingColors } from '@documenso/lib/utils/email-branding-colors';
 import { createContext, useContext } from 'react';
 
 type BrandingContextValue = {
@@ -7,7 +6,6 @@ type BrandingContextValue = {
   brandingLogo: string;
   brandingCompanyDetails: string;
   brandingHidePoweredBy: boolean;
-  brandingColors?: EmailBrandingColors;
 };
 
 const BrandingContext = createContext<BrandingContextValue | undefined>(undefined);

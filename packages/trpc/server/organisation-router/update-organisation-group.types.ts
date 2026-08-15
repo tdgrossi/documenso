@@ -1,4 +1,3 @@
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { OrganisationMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
@@ -15,7 +14,7 @@ import { z } from 'zod';
 
 export const ZUpdateOrganisationGroupRequestSchema = z.object({
   id: z.string(),
-  name: ZNameSchema.nullable().optional(),
+  name: z.string().nullable().optional(),
   organisationRole: z.nativeEnum(OrganisationMemberRole).optional(),
   memberIds: z.array(z.string()).optional(),
 });

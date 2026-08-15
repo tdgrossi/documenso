@@ -3,8 +3,6 @@ import type { SentMessageInfo, Transport } from 'nodemailer';
 import type { Address } from 'nodemailer/lib/mailer';
 import type MailMessage from 'nodemailer/lib/mailer/mail-message';
 
-import { normalizeMailHeaders } from './normalize-headers';
-
 const VERSION = '1.0.0';
 
 type NodeMailerAddress = string | Address | Array<string | Address> | undefined;
@@ -56,7 +54,6 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
     const mailBcc = this.toMailChannelsAddresses(mail.data.bcc);
 
     const [from] = this.toMailChannelsAddresses(mail.data.from);
-    const [replyTo] = this.toMailChannelsAddresses(mail.data.replyTo);
 
     if (!from) {
       return callback(new Error('Missing required field "from"'), null);
@@ -75,8 +72,6 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
       headers: requestHeaders,
       body: JSON.stringify({
         from: from,
-        reply_to: replyTo,
-        headers: normalizeMailHeaders(mail.data.headers),
         subject: mail.data.subject,
         personalizations: [
           {

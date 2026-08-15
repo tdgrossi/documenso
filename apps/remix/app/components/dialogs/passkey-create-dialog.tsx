@@ -1,6 +1,5 @@
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -26,13 +25,14 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 import { z } from 'zod';
+
 export type PasskeyCreateDialogProps = {
   trigger?: React.ReactNode;
   onSuccess?: () => void;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZCreatePasskeyFormSchema = z.object({
-  passkeyName: ZNameSchema,
+  passkeyName: z.string().min(3),
 });
 
 type TCreatePasskeyFormSchema = z.infer<typeof ZCreatePasskeyFormSchema>;

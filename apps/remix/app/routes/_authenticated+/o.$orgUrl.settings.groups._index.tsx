@@ -10,7 +10,6 @@ export default function TeamsSettingsMembersPage() {
   return (
     <div>
       <SettingsHeader
-        hideDivider
         title={t`Custom Organisation Groups`}
         subtitle={t`Manage the custom groups of members for your organisation.`}
       >

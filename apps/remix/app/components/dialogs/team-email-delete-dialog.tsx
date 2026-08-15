@@ -17,25 +17,28 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Team, TeamEmail, TeamEmailVerification } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { useState } from 'react';
 import { useRevalidator } from 'react-router';
 
 export type TeamEmailDeleteDialogProps = {
   trigger?: React.ReactNode;
   teamName: string;
-  team: Pick<Team, 'id' | 'avatarImageId' | 'name'>;
-  teamEmail: Pick<TeamEmail, 'email' | 'name'> | null;
-  emailVerification: Pick<TeamEmailVerification, 'email' | 'name' | 'expiresAt'> | null;
+  team: Prisma.TeamGetPayload<{
+    include: {
+      teamEmail: true;
+      emailVerification: {
+        select: {
+          expiresAt: true;
+          name: true;
+          email: true;
+        };
+      };
+    };
+  }>;
 };
 
-export const TeamEmailDeleteDialog = ({
-  trigger,
-  teamName,
-  team,
-  teamEmail,
-  emailVerification,
-}: TeamEmailDeleteDialogProps) => {
+export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDeleteDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { _ } = useLingui();
@@ -80,11 +83,11 @@ export const TeamEmailDeleteDialog = ({
     });
 
   const onRemove = async () => {
-    if (teamEmail) {
+    if (team.teamEmail) {
       await deleteTeamEmail({ teamId: team.id });
     }
 
-    if (emailVerification) {
+    if (team.emailVerification) {
       await deleteTeamEmailVerification({ teamId: team.id });
     }
 
@@ -118,13 +121,13 @@ export const TeamEmailDeleteDialog = ({
           <AvatarWithText
             avatarClass="h-12 w-12"
             avatarSrc={formatAvatarUrl(team.avatarImageId)}
-            avatarFallback={extractInitials((teamEmail?.name || emailVerification?.name) ?? '')}
+            avatarFallback={extractInitials((team.teamEmail?.name || team.emailVerification?.name) ?? '')}
             primaryText={
               <span className="font-semibold text-foreground/80 text-sm">
-                {teamEmail?.name || emailVerification?.name}
+                {team.teamEmail?.name || team.emailVerification?.name}
               </span>
             }
-            secondaryText={<span className="text-sm">{teamEmail?.email || emailVerification?.email}</span>}
+            secondaryText={<span className="text-sm">{team.teamEmail?.email || team.emailVerification?.email}</span>}
           />
         </Alert>
 

@@ -13,17 +13,7 @@ export const duplicateEnvelopeMeta: TrpcRouteMeta = {
 };
 
 export const ZDuplicateEnvelopeRequestSchema = z.object({
-  envelopeId: z.string().min(1).describe('The ID of the envelope to duplicate.'),
-  includeRecipients: z
-    .boolean()
-    .optional()
-    .default(true)
-    .describe('Whether to copy the recipients to the duplicated envelope. Defaults to true.'),
-  includeFields: z
-    .boolean()
-    .optional()
-    .default(true)
-    .describe('Whether to copy the fields to the duplicated envelope. Requires includeRecipients. Defaults to true.'),
+  envelopeId: z.string(),
 });
 
 export const ZDuplicateEnvelopeResponseSchema = z.object({

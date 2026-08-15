@@ -1,9 +1,7 @@
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getPublicProfileByUrl } from '@documenso/lib/server-only/profile/get-public-profile-by-url';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -54,19 +52,6 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
-
-  const canManageProfileSettings = (sessionData?.organisations ?? []).some((organisation) => {
-    const team = organisation.teams.find((currentTeam) => currentTeam.id === profile.teamId);
-
-    if (!team) {
-      return false;
-    }
-
-    return (
-      canExecuteOrganisationAction('MANAGE_ORGANISATION', organisation.currentOrganisationRole) ||
-      canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole)
-    );
-  });
 
   return (
     <div className="flex flex-col items-center justify-center py-4 sm:py-32">
@@ -133,11 +118,11 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
                 </Trans>
               </span>
             )}
-            {canManageProfileSettings && (
+            {'userId' in profile && user?.id === profile.userId && (
               <span className="mt-2 inline-block">
                 <Trans>
                   Go to your{' '}
-                  <Link to={`/t/${publicProfile.url}/settings/public-profile`} className="underline">
+                  <Link to="/settings/public-profile" className="underline">
                     public profile settings
                   </Link>{' '}
                   to add documents.

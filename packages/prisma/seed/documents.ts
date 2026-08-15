@@ -310,9 +310,6 @@ export const seedDraftDocument = async (
 
   const documentId = await incrementDocumentId();
 
-  const envelopeTitle =
-    typeof createDocumentOptions.title === 'string' ? createDocumentOptions.title : `[TEST] Document ${key} - Draft`;
-
   const document = await prisma.envelope.create({
     data: {
       id: prefixedId('envelope'),
@@ -323,12 +320,12 @@ export const seedDraftDocument = async (
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
       teamId,
-      title: envelopeTitle,
+      title: `[TEST] Document ${key} - Draft`,
       status: DocumentStatus.DRAFT,
       envelopeItems: {
         create: {
           id: prefixedId('envelope_item'),
-          title: envelopeTitle,
+          title: `[TEST] Document ${key} - Draft`,
           documentDataId: documentData.id,
           order: 1,
         },

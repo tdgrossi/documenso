@@ -1,5 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
+import { sendPendingEmail } from '@documenso/lib/server-only/document/send-pending-email';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { triggerWebhook } from '@documenso/lib/server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -473,12 +474,9 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
   });
 
   if (pendingRecipients.length > 0) {
-    await jobs.triggerJob({
-      name: 'send.document.pending.email',
-      payload: {
-        envelopeId: envelope.id,
-        recipientId: recipient.id,
-      },
+    await sendPendingEmail({
+      id: { type: 'envelopeId', id: envelope.id },
+      recipientId: recipient.id,
     });
 
     // TSP envelopes are forced SEQUENTIAL at send-time; this branch always

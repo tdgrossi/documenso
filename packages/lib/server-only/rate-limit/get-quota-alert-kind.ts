@@ -1,4 +1,4 @@
-import { getQuotaWarningCount } from '../../universal/quota-usage';
+export const QUOTA_WARNING_THRESHOLD = 0.8;
 
 export type QuotaAlertKind = 'quota' | 'quotaNearing';
 
@@ -32,7 +32,7 @@ export const getQuotaAlertKind = (opts: GetQuotaAlertKindOptions): QuotaAlertKin
   // From here newCount < quota, so for tiny quotas (1-4) where the rounded-up
   // warning threshold equals the quota itself, the warning can never fire — the
   // exhausting request is handled by the quota branch above.
-  const warningCount = getQuotaWarningCount(quota);
+  const warningCount = Math.ceil(quota * QUOTA_WARNING_THRESHOLD);
 
   const didCrossWarning = newCount >= warningCount && previousCount < warningCount;
 

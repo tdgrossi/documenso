@@ -313,14 +313,23 @@ test.describe('Signing Certificate Tests', () => {
     await apiSignin({
       page,
       email: owner.email,
-      redirectPath: `/t/${team.url}/settings/certificates`,
+      redirectPath: `/t/${team.url}/settings/document`,
     });
 
-    await page.getByTestId('include-signing-certificate-trigger').click();
+    await page
+      .getByRole('group')
+      .locator('div')
+      .filter({ hasText: 'Include the Signing' })
+      .getByRole('combobox')
+      .click();
     await page.getByRole('option', { name: 'No' }).click();
 
-    await page.getByRole('button', { name: 'Save changes' }).first().click();
-    await expect(page.getByText('Your certificate preferences have been updated').first()).toBeVisible();
+    await page
+      .getByRole('button', { name: /Update/ })
+      .first()
+      .click();
+
+    await page.waitForTimeout(1000);
 
     // Verify the setting was saved
     const updatedTeam = await prisma.team.findFirstOrThrow({
@@ -331,21 +340,26 @@ test.describe('Signing Certificate Tests', () => {
     expect(updatedTeam.teamGlobalSettings?.includeSigningCertificate).toBe(false);
 
     // Toggle the setting back to true
-    await page.getByTestId('include-signing-certificate-trigger').click();
+    await page
+      .getByRole('group')
+      .locator('div')
+      .filter({ hasText: 'Include the Signing' })
+      .getByRole('combobox')
+      .click();
     await page.getByRole('option', { name: 'Yes' }).click();
-    await page.getByRole('button', { name: 'Save changes' }).first().click();
+    await page
+      .getByRole('button', { name: /Update/ })
+      .first()
+      .click();
 
-    // The toast from the first save may still be visible, so poll the database
-    // for the saved value instead of waiting on UI signals.
-    await expect
-      .poll(async () => {
-        const updatedTeam = await prisma.team.findFirstOrThrow({
-          where: { id: team.id },
-          include: { teamGlobalSettings: true },
-        });
+    await page.waitForTimeout(1000);
 
-        return updatedTeam.teamGlobalSettings?.includeSigningCertificate;
-      })
-      .toBe(true);
+    // Verify the setting was saved
+    const updatedTeam2 = await prisma.team.findFirstOrThrow({
+      where: { id: team.id },
+      include: { teamGlobalSettings: true },
+    });
+
+    expect(updatedTeam2.teamGlobalSettings?.includeSigningCertificate).toBe(true);
   });
 });

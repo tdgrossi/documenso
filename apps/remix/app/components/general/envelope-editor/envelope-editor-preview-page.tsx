@@ -22,7 +22,6 @@ import { match } from 'ts-pattern';
 import { EnvelopeGenericPageRenderer } from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { EnvelopePdfViewer } from '~/components/general/pdf-viewer/envelope-pdf-viewer';
 
-import { EnvelopeEditorInvalidDirectTemplateAlert } from './envelope-editor-invalid-direct-template-alert';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 
 export const EnvelopeEditorPreviewPage = () => {
@@ -228,8 +227,6 @@ export const EnvelopeEditorPreviewPage = () => {
         <div className="flex h-full w-full flex-col overflow-y-auto px-2" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
           <EnvelopeRendererFileSelector className="px-0" fields={editorFields.localFields} />
-
-          <EnvelopeEditorInvalidDirectTemplateAlert className="mb-4" />
 
           <Alert variant="warning" className="mx-auto max-w-[800px]">
             <AlertTitle>

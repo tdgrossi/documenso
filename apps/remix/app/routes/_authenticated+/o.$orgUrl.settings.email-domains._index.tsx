@@ -1,6 +1,7 @@
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED, IS_DOCUMENSO_CLOUD } from '@documenso/lib/constants/app';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
@@ -9,7 +10,6 @@ import { Link } from 'react-router';
 
 import { OrganisationEmailDomainCreateDialog } from '~/components/dialogs/organisation-email-domain-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { EmailDomainsUpsell } from '~/components/general/settings-upsell/email-domains-upsell';
 import { OrganisationEmailDomainsDataTable } from '~/components/tables/organisation-email-domains-table';
 import { appMetaTags } from '~/utils/meta';
 
@@ -19,8 +19,11 @@ export function meta() {
 
 export default function OrganisationSettingsEmailDomains() {
   const { t } = useLingui();
+  const { organisations } = useSession();
 
   const organisation = useCurrentOrganisation();
+
+  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const isEmailDomainsEnabled = organisation.organisationClaim.flags.emailDomains;
 
@@ -30,11 +33,7 @@ export default function OrganisationSettingsEmailDomains() {
 
   return (
     <div>
-      <SettingsHeader
-        hideDivider
-        title={t`Email Domains`}
-        subtitle={t`Here you can add email domains to your organisation.`}
-      >
+      <SettingsHeader title={t`Email Domains`} subtitle={t`Here you can add email domains to your organisation.`}>
         {isEmailDomainsEnabled && <OrganisationEmailDomainCreateDialog />}
       </SettingsHeader>
 
@@ -42,8 +41,6 @@ export default function OrganisationSettingsEmailDomains() {
         <section>
           <OrganisationEmailDomainsDataTable />
         </section>
-      ) : IS_DOCUMENSO_CLOUD() ? (
-        <EmailDomainsUpsell />
       ) : (
         <Alert className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center" variant="neutral">
           <div className="mb-4 sm:mb-0">
@@ -58,7 +55,7 @@ export default function OrganisationSettingsEmailDomains() {
 
           {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
             <Button asChild variant="outline">
-              <Link to={`/o/${organisation.url}/settings/billing`}>
+              <Link to={isPersonalLayoutMode ? '/settings/billing' : `/o/${organisation.url}/settings/billing`}>
                 <Trans>Update Billing</Trans>
               </Link>
             </Button>

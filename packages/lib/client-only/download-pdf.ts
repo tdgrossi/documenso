@@ -32,11 +32,7 @@ const versionToFilenameSuffix = (version: DocumentVersion): string => {
   }
 };
 
-/**
- * Fetches a PDF for an envelope item and returns it as a blob alongside the
- * filename it should be saved as. Throws on non-OK responses.
- */
-export const fetchPDF = async ({ envelopeItem, token, fileName, version = 'signed' }: DownloadPDFProps) => {
+export const downloadPDF = async ({ envelopeItem, token, fileName, version = 'signed' }: DownloadPDFProps) => {
   const downloadUrl = getEnvelopeItemPdfUrl({
     type: 'download',
     envelopeItem: envelopeItem,
@@ -44,27 +40,12 @@ export const fetchPDF = async ({ envelopeItem, token, fileName, version = 'signe
     version,
   });
 
-  const response = await fetch(downloadUrl);
-
-  if (!response.ok) {
-    throw new Error(`Failed to download PDF: ${response.status}`);
-  }
-
-  const blob = await response.blob();
+  const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
 
   const baseTitle = (fileName ?? 'document').replace(/\.pdf$/, '');
 
-  return {
-    filename: `${baseTitle}${versionToFilenameSuffix(version)}`,
-    blob,
-  };
-};
-
-export const downloadPDF = async (options: DownloadPDFProps) => {
-  const { filename, blob } = await fetchPDF(options);
-
   downloadFile({
-    filename,
+    filename: `${baseTitle}${versionToFilenameSuffix(version)}`,
     data: blob,
   });
 };

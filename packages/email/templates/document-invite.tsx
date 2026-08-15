@@ -56,12 +56,11 @@ export const DocumentInviteEmailTemplate = ({
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
-      <Body className="mx-auto my-auto bg-background font-sans">
-        <Preview>{_(previewText)}</Preview>
-
+      <Body className="mx-auto my-auto bg-white font-sans">
         <Section>
-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-border border-solid p-4 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
             <Section>
               <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
 
@@ -86,14 +85,14 @@ export const DocumentInviteEmailTemplate = ({
                 <Text className="my-4 font-semibold text-base">
                   <Trans>
                     {inviterName}{' '}
-                    <Link className="font-normal text-muted-foreground" href={`mailto:${inviterEmail}`}>
+                    <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
                       ({inviterEmail})
                     </Link>
                   </Trans>
                 </Text>
               )}
 
-              <Text className="mt-2 text-base text-muted-foreground">
+              <Text className="mt-2 text-base text-slate-400">
                 {customBody ? (
                   <TemplateCustomMessageBody text={customBody} />
                 ) : (

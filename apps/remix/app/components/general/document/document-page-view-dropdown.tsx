@@ -19,7 +19,6 @@ import {
   Download,
   Edit,
   FileOutputIcon,
-  History,
   Loader,
   MoreHorizontal,
   Pencil,
@@ -30,10 +29,10 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
+import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { EnvelopeDeleteDialog } from '~/components/dialogs/envelope-delete-dialog';
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
-import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { EnvelopeRenameDialog } from '~/components/dialogs/envelope-rename-dialog';
 import { EnvelopeSaveAsTemplateDialog } from '~/components/dialogs/envelope-save-as-template-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
@@ -67,6 +66,8 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   const { canTitleBeChanged } = getEnvelopeItemPermissions(envelope, []);
 
   const documentsPath = formatDocumentsPath(team.url);
+
+  const nonSignedRecipients = envelope.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
     <DropdownMenu>
@@ -171,20 +172,13 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           />
         )}
 
-        {canManageDocument && (
-          <EnvelopeRedistributeDialog
-            envelope={envelope}
-            envelopeType={EnvelopeType.DOCUMENT}
-            trigger={
-              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-                <div>
-                  <History className="mr-2 h-4 w-4" />
-                  <Trans>Resend</Trans>
-                </div>
-              </DropdownMenuItem>
-            }
-          />
-        )}
+        <DocumentResendDialog
+          document={{
+            ...envelope,
+            id: mapSecondaryIdToDocumentId(envelope.secondaryId),
+          }}
+          recipients={nonSignedRecipients}
+        />
 
         <DocumentShareButton
           documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}

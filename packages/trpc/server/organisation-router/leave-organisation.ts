@@ -1,7 +1,9 @@
+import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
+import { OrganisationMemberInviteStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZLeaveOrganisationRequestSchema, ZLeaveOrganisationResponseSchema } from './leave-organisation.types';
@@ -22,7 +24,22 @@ export const leaveOrganisationRoute = authenticatedProcedure
     const organisation = await prisma.organisation.findFirst({
       where: buildOrganisationWhereQuery({ organisationId, userId }),
       include: {
+        organisationClaim: true,
+        subscription: true,
         teams: {
+          select: {
+            id: true,
+          },
+        },
+        invites: {
+          where: {
+            status: OrganisationMemberInviteStatus.PENDING,
+          },
+          select: {
+            id: true,
+          },
+        },
+        members: {
           select: {
             id: true,
           },
@@ -34,12 +51,15 @@ export const leaveOrganisationRoute = authenticatedProcedure
       throw new AppError(AppErrorCode.NOT_FOUND);
     }
 
-    // The organisation owner cannot leave their own organisation. Ownership must
-    // be transferred to another member first.
-    if (organisation.ownerUserId === userId) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You cannot leave an organisation you own. Please transfer ownership first.',
-      });
+    const { organisationClaim } = organisation;
+
+    const inviteCount = organisation.invites.length;
+    const newMemberCount = organisation.members.length + inviteCount - 1;
+
+    // Leaving is a reducing operation, so we don't gate it on the subscription
+    // being present. Sync Stripe only when one exists.
+    if (organisation.subscription) {
+      await syncMemberCountWithStripeSeatPlan(organisation.subscription, organisationClaim, newMemberCount);
     }
 
     const teamIds = organisation.teams.map((team) => team.id);
@@ -71,13 +91,6 @@ export const leaveOrganisationRoute = authenticatedProcedure
           },
         },
       });
-    });
-
-    // A member was removed — queue a seat sync to true the Stripe quantity down
-    // to the new count (no proration, no credit).
-    await jobs.triggerJob({
-      name: 'internal.sync-organisation-seats',
-      payload: { organisationId },
     });
 
     await jobs.triggerJob({

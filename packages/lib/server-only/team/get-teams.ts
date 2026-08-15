@@ -15,12 +15,12 @@ export type GetTeamsOptions = {
 };
 
 export const ZGetTeamsResponseSchema = TeamSchema.extend({
-  currentTeamRole: z.nativeEnum(TeamMemberRole),
+  teamRole: z.nativeEnum(TeamMemberRole),
 }).array();
 
 export type TGetTeamsResponse = z.infer<typeof ZGetTeamsResponseSchema>;
 
-export const getTeams = async ({ userId, teamId }: GetTeamsOptions): Promise<TGetTeamsResponse> => {
+export const getTeams = async ({ userId, teamId }: GetTeamsOptions) => {
   const teams = await prisma.team.findMany({
     where: buildTeamWhereQuery({ teamId, userId }),
     include: {

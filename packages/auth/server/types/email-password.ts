@@ -1,4 +1,4 @@
-import { ZNameSchema } from '@documenso/lib/types/name';
+import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { zEmail } from '@documenso/lib/utils/zod';
 import { z } from 'zod';
 

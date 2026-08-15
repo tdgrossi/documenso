@@ -3,7 +3,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { checkDocumentCounts } from '../fixtures/documents';
+import { checkDocumentTabCount } from '../fixtures/documents';
 import { expectToastTextToBeVisible, openDropdownMenu } from '../fixtures/generic';
 
 test.describe.configure({ mode: 'serial' });
@@ -174,7 +174,11 @@ test('[DOCUMENTS]: deleting draft documents should permanently remove it', async
   await expect(page.getByRole('row', { name: /Document 1 - Draft/ })).not.toBeVisible();
 
   // Check document counts.
-  await checkDocumentCounts(page, { inbox: 0, pending: 1, completed: 1, draft: 0, all: 2 });
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 1);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 2);
 });
 
 test('[DOCUMENTS]: deleting pending documents should permanently remove it', async ({ page }) => {
@@ -203,7 +207,11 @@ test('[DOCUMENTS]: deleting pending documents should permanently remove it', asy
   await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
 
   // Check document counts.
-  await checkDocumentCounts(page, { inbox: 0, pending: 0, completed: 1, draft: 1, all: 2 });
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 1);
+  await checkDocumentTabCount(page, 'All', 2);
 });
 
 test('[DOCUMENTS]: deleting completed documents as an owner should hide it from only the owner', async ({ page }) => {
@@ -231,7 +239,11 @@ test('[DOCUMENTS]: deleting completed documents as an owner should hide it from 
 
   // Check document counts.
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
-  await checkDocumentCounts(page, { inbox: 0, pending: 1, completed: 0, draft: 1, all: 2 });
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 1);
+  await checkDocumentTabCount(page, 'Completed', 0);
+  await checkDocumentTabCount(page, 'Draft', 1);
+  await checkDocumentTabCount(page, 'All', 2);
 
   // Sign into the recipient account.
   await apiSignout({ page });
@@ -243,7 +255,11 @@ test('[DOCUMENTS]: deleting completed documents as an owner should hide it from 
 
   // Check document counts.
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).toBeVisible();
-  await checkDocumentCounts(page, { inbox: 1, pending: 0, completed: 1, draft: 0, all: 2 });
+  await checkDocumentTabCount(page, 'Inbox', 1);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 2);
 });
 
 test('[DOCUMENTS]: deleting documents as a recipient should only hide it for them', async ({ page }) => {
@@ -284,7 +300,11 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   // Check document counts.
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
   await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
-  await checkDocumentCounts(page, { inbox: 0, pending: 0, completed: 0, draft: 0, all: 0 });
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 0);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 0);
 
   // Sign into the sender account.
   await apiSignout({ page });
@@ -295,7 +315,11 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   });
 
   // Check document counts for sender.
-  await checkDocumentCounts(page, { inbox: 0, pending: 1, completed: 1, draft: 1, all: 3 });
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 1);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 1);
+  await checkDocumentTabCount(page, 'All', 3);
 
   // Sign into the other recipient account.
   await apiSignout({ page });
@@ -306,5 +330,9 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   });
 
   // Check document counts for other recipient.
-  await checkDocumentCounts(page, { inbox: 1, pending: 0, completed: 1, draft: 0, all: 2 });
+  await checkDocumentTabCount(page, 'Inbox', 1);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 2);
 });

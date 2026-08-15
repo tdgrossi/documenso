@@ -1,5 +1,4 @@
 import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
@@ -12,6 +11,7 @@ import { isTspEnvelope } from '@documenso/lib/types/signature-level';
 import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
+
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
@@ -60,9 +60,8 @@ export const recipientRouter = router({
         path: '/document/recipient/{recipientId}',
         summary: 'Get document recipient',
         description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Returns a single recipient. If you want to retrieve all the recipients for a document, use the "Get Document" endpoint.',
+          'Returns a single recipient. If you want to retrieve all the recipients for a document, use the "Get Document" endpoint.',
         tags: ['Document Recipients'],
-        deprecated: true,
       },
     })
     .input(ZGetRecipientRequestSchema)
@@ -94,10 +93,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/create',
         summary: 'Create document recipient',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a single recipient for a document.',
+        description: 'Create a single recipient for a document.',
         tags: ['Document Recipients'],
-        deprecated: true,
       },
     })
     .input(ZCreateDocumentRecipientRequestSchema)
@@ -135,10 +132,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/create-many',
         summary: 'Create document recipients',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create multiple recipients for a document.',
+        description: 'Create multiple recipients for a document.',
         tags: ['Document Recipients'],
-        deprecated: true,
       },
     })
     .input(ZCreateDocumentRecipientsRequestSchema)
@@ -174,10 +169,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/update',
         summary: 'Update document recipient',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update a single recipient for a document.',
+        description: 'Update a single recipient for a document.',
         tags: ['Document Recipients'],
-        deprecated: true,
       },
     })
     .input(ZUpdateDocumentRecipientRequestSchema)
@@ -215,10 +208,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/update-many',
         summary: 'Update document recipients',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update multiple recipients for a document.',
+        description: 'Update multiple recipients for a document.',
         tags: ['Document Recipients'],
-        deprecated: true,
       },
     })
     .input(ZUpdateDocumentRecipientsRequestSchema)
@@ -254,10 +245,7 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/document/recipient/delete',
         summary: 'Delete document recipient',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Document Recipients'],
-        deprecated: true,
       },
     })
     .input(ZDeleteDocumentRecipientRequestSchema)
@@ -327,9 +315,8 @@ export const recipientRouter = router({
         path: '/template/recipient/{recipientId}',
         summary: 'Get template recipient',
         description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Returns a single recipient. If you want to retrieve all the recipients for a template, use the "Get Template" endpoint.',
+          'Returns a single recipient. If you want to retrieve all the recipients for a template, use the "Get Template" endpoint.',
         tags: ['Template Recipients'],
-        deprecated: true,
       },
     })
     .input(ZGetRecipientRequestSchema)
@@ -361,10 +348,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/create',
         summary: 'Create template recipient',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a single recipient for a template.',
+        description: 'Create a single recipient for a template.',
         tags: ['Template Recipients'],
-        deprecated: true,
       },
     })
     .input(ZCreateTemplateRecipientRequestSchema)
@@ -402,10 +387,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/create-many',
         summary: 'Create template recipients',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create multiple recipients for a template.',
+        description: 'Create multiple recipients for a template.',
         tags: ['Template Recipients'],
-        deprecated: true,
       },
     })
     .input(ZCreateTemplateRecipientsRequestSchema)
@@ -441,10 +424,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/update',
         summary: 'Update template recipient',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update a single recipient for a template.',
+        description: 'Update a single recipient for a template.',
         tags: ['Template Recipients'],
-        deprecated: true,
       },
     })
     .input(ZUpdateTemplateRecipientRequestSchema)
@@ -482,10 +463,8 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/update-many',
         summary: 'Update template recipients',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Update multiple recipients for a template.',
+        description: 'Update multiple recipients for a template.',
         tags: ['Template Recipients'],
-        deprecated: true,
       },
     })
     .input(ZUpdateTemplateRecipientsRequestSchema)
@@ -521,10 +500,7 @@ export const recipientRouter = router({
         method: 'POST',
         path: '/template/recipient/delete',
         summary: 'Delete template recipient',
-        description:
-          'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
         tags: ['Template Recipients'],
-        deprecated: true,
       },
     })
     .input(ZDeleteTemplateRecipientRequestSchema)
@@ -590,72 +566,47 @@ export const recipientRouter = router({
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .output(ZCompleteDocumentWithTokenResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { token, documentId, accessAuthOptions, nextSigner, recipientOverride } = input;
+      const { token, documentId, accessAuthOptions, nextSigner, recipientOverride } = input;
 
-        ctx.logger.info({
-          input: {
-            documentId,
-          },
-        });
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
-        // Branch on TSP envelopes before any SES side effects: TSP recipients
-        // can't complete via this route — they go through the CSC sync sign
-        // flow (`enterprise.csc.signEnvelope`). This route returns the redirect URL
-        // for the credential-scope OAuth round-trip.
-        const envelope = await prisma.envelope.findFirstOrThrow({
-          where: {
-            ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
-            recipients: { some: { token } },
-          },
-          select: { signatureLevel: true, internalVersion: true },
-        });
+      // Branch on TSP envelopes before any SES side effects: TSP recipients
+      // can't complete via this route — they go through the CSC sync sign
+      // flow (`enterprise.csc.signEnvelope`). This route returns the redirect URL
+      // for the credential-scope OAuth round-trip.
+      const envelope = await prisma.envelope.findFirstOrThrow({
+        where: {
+          ...unsafeBuildEnvelopeIdQuery({ type: 'documentId', id: documentId }, EnvelopeType.DOCUMENT),
+          recipients: { some: { token } },
+        },
+        select: { signatureLevel: true, internalVersion: true },
+      });
 
-        if (isTspEnvelope(envelope)) {
-          return await prepareCscRecipientSigning({
-            recipientToken: token,
-            requestMetadata: ctx.metadata.requestMetadata,
-          });
-        }
-
-        await completeDocumentWithToken({
-          token,
-          id: {
-            type: 'documentId',
-            id: documentId,
-          },
-          accessAuthOptions,
-          nextSigner,
-          recipientOverride,
-          userId: ctx.user?.id,
+      if (isTspEnvelope(envelope)) {
+        return await prepareCscRecipientSigning({
+          recipientToken: token,
           requestMetadata: ctx.metadata.requestMetadata,
         });
-
-        return { status: 'SIGNED' as const };
-      } catch (err) {
-        // Resolve retried, stale or concurrent duplicate completion requests
-        // idempotently so the client routes the user to the completed page
-        // instead of surfacing an error for a document that is signed.
-        if (err instanceof AppError && err.code === AppErrorCode.RECIPIENT_ALREADY_SIGNED) {
-          ctx.logger.info({
-            message: 'Recipient attempted to complete a document they have already signed',
-          });
-
-          return { status: 'ALREADY_SIGNED' as const };
-        }
-
-        // Log the error for debugging purposes.
-        ctx.logger.error({
-          message: 'Error completing document with token',
-          error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
-        });
-
-        // Raw console.log incase we're somehow dealing with a funky error object that doesn't serialize well.
-        console.log('Error completing document with token', err);
-
-        // Rethrow the error so that the client receives the appropriate error response.
-        throw err;
       }
+
+      await completeDocumentWithToken({
+        token,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
+        accessAuthOptions,
+        nextSigner,
+        recipientOverride,
+        userId: ctx.user?.id,
+        requestMetadata: ctx.metadata.requestMetadata,
+      });
+
+      return { status: 'SIGNED' as const };
     }),
 
   /**

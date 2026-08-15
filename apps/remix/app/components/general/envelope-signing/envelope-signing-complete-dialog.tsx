@@ -42,11 +42,7 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   const { onDocumentCompleted, onDocumentError } = useEmbedSigningContext() || {};
 
-  const {
-    mutateAsync: completeDocument,
-    isPending,
-    isSuccess,
-  } = trpc.recipient.completeDocumentWithToken.useMutation();
+  const { mutateAsync: completeDocument, isPending } = trpc.recipient.completeDocumentWithToken.useMutation();
 
   const { mutateAsync: createDocumentFromDirectTemplate } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
@@ -110,21 +106,11 @@ export const EnvelopeSignerCompleteDialog = () => {
         return;
       }
 
-      // The document was already completed by an earlier request (retry,
-      // stale tab or concurrent submission). Let the user know this click
-      // didn't complete the document, then continue to the completed page.
-      if (result.status === 'ALREADY_SIGNED') {
-        toast({
-          title: t`Document already signed`,
-          description: t`This document was already signed and no further action was taken.`,
-        });
-      } else {
-        analytics.capture('App: Recipient has completed signing', {
-          signerId: recipient.id,
-          documentId: envelope.id,
-          timestamp: new Date().toISOString(),
-        });
-      }
+      analytics.capture('App: Recipient has completed signing', {
+        signerId: recipient.id,
+        documentId: envelope.id,
+        timestamp: new Date().toISOString(),
+      });
 
       if (onDocumentCompleted) {
         onDocumentCompleted({
@@ -260,7 +246,7 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   return (
     <DocumentSigningCompleteDialog
-      isSubmitting={isPending || isSuccess}
+      isSubmitting={isPending}
       recipientPayload={recipientPayload}
       onSignatureComplete={isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick}
       documentTitle={envelope.title}

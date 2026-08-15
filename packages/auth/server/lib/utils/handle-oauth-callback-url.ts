@@ -1,4 +1,4 @@
-import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import {
   isDisposableEmail,
   isEmailDomainAllowedForSignup,
@@ -121,7 +121,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Check if signups are disabled for this provider.
   if (!isSignupEnabledForProvider(clientOptions.id as 'google' | 'microsoft' | 'oidc')) {
-    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+    const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
 
     errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
 
@@ -130,7 +130,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   // Check domain restriction for new SSO users.
   if (!isEmailDomainAllowedForSignup(email)) {
-    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+    const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
 
     errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisabled);
 
@@ -141,7 +141,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   const additionalBlockedDomains = await getEmailBlocklistDomains();
 
   if (isDisposableEmail(email, additionalBlockedDomains)) {
-    const errorUrl = new URL(formatPath('/signin'), NEXT_PUBLIC_WEBAPP_URL());
+    const errorUrl = new URL('/signin', NEXT_PUBLIC_WEBAPP_URL());
 
     errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDisposableEmail);
 
@@ -213,18 +213,15 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   // eslint-disable-next-line prefer-const
   let [redirectState, redirectPath] = storedRedirectPath.split(' ');
 
-  // The sub-path aware root, e.g. "/" or "/ESign/".
-  const defaultRedirectPath = formatPath('/');
-
   if (redirectState !== storedState || !redirectPath) {
-    redirectPath = defaultRedirectPath;
+    redirectPath = '/';
   }
 
   if (!isValidReturnTo(redirectPath)) {
-    redirectPath = defaultRedirectPath;
+    redirectPath = '/';
   }
 
-  redirectPath = normalizeReturnTo(redirectPath) || defaultRedirectPath;
+  redirectPath = normalizeReturnTo(redirectPath) || '/';
 
   const tokens = await oAuthClient.validateAuthorizationCode(token_endpoint, code, storedCodeVerifier);
 

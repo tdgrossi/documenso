@@ -31,12 +31,8 @@ export const loadRecipientBrandingByTeamId = async ({
     billingEnabled ? getOrganisationClaimByTeamId({ teamId }).catch(() => null) : Promise.resolve(null),
   ]);
 
-  let allowCustomBranding = !billingEnabled || claim?.flags?.embedSigningWhiteLabel === true;
+  const allowCustomBranding = !billingEnabled || claim?.flags?.embedSigningWhiteLabel === true;
   const hidePoweredBy = !billingEnabled || claim?.flags?.hidePoweredBy === true;
-
-  if (!settings.brandingEnabled) {
-    allowCustomBranding = false;
-  }
 
   if (!allowCustomBranding) {
     return {

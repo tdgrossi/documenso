@@ -36,12 +36,6 @@ export const DEFAULT_ENVELOPE_REMINDER_SETTINGS: TEnvelopeReminderSettings = {
  */
 export const MAX_REMINDER_WINDOW_DAYS = 30;
 
-/**
- * Maximum number of automated reminders sent to a recipient before reminders
- * stop. A manual resend resets the count, re-arming reminders.
- */
-export const MAX_REMINDERS_BEFORE_RESEND = 5;
-
 const UNIT_TO_LUXON_KEY: Record<TEnvelopeReminderDurationPeriod['unit'], keyof DurationLikeObject> = {
   day: 'days',
   week: 'weeks',
@@ -59,26 +53,21 @@ export const getEnvelopeReminderDuration = (period: TEnvelopeReminderDurationPer
  * - `{ sendAfter: { disabled: true }, ... }` means never send the first reminder.
  * - `{ repeatEvery: { disabled: true }, ... }` means don't repeat after the first reminder.
  *
- * Reminders stop (returns null) once either cap is hit: `MAX_REMINDER_WINDOW_DAYS`
- * from `sentAt`, or `MAX_REMINDERS_BEFORE_RESEND` reminders already sent.
+ * A hard cap of `MAX_REMINDER_WINDOW_DAYS` days from `sentAt` is enforced —
+ * any computed reminder beyond that point returns null so reminders stop.
  *
  * `sentAt` is when the signing request was sent to this specific recipient.
  *
- * Returns the next Date the reminder should be sent, or null if none.
+ * Returns the next Date the reminder should be sent, or null if no reminder should be sent.
  */
 export const resolveNextReminderAt = (options: {
   config: TEnvelopeReminderSettings | null;
   sentAt: Date;
   lastReminderSentAt: Date | null;
-  reminderCount: number;
 }): Date | null => {
-  const { config, sentAt, lastReminderSentAt, reminderCount } = options;
+  const { config, sentAt, lastReminderSentAt } = options;
 
   if (!config) {
-    return null;
-  }
-
-  if (reminderCount >= MAX_REMINDERS_BEFORE_RESEND) {
     return null;
   }
 

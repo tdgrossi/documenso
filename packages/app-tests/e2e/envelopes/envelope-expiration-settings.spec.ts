@@ -15,11 +15,11 @@ test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level'
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/o/${organisation.url}/settings/reminders`,
+    redirectPath: `/o/${organisation.url}/settings/document`,
   });
 
   // Wait for the form to load.
-  await expect(page.getByTestId('envelope-expiration-mode')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Update' }).first()).toBeVisible();
 
   // Change the amount to 2.
   const amountInput = page.getByTestId('envelope-expiration-amount');
@@ -35,8 +35,8 @@ test('[ENVELOPE_EXPIRATION]: set custom expiration period at organisation level'
   await unitTrigger.click();
   await page.getByRole('option', { name: 'Weeks' }).click();
 
-  await page.getByRole('button', { name: 'Save changes' }).first().click();
-  await expect(page.getByText('Your reminder preferences have been updated').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
   // Verify via database.
   const orgSettings = await prisma.organisationGlobalSettings.findUniqueOrThrow({
@@ -54,18 +54,18 @@ test('[ENVELOPE_EXPIRATION]: disable expiration at organisation level', async ({
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/o/${organisation.url}/settings/reminders`,
+    redirectPath: `/o/${organisation.url}/settings/document`,
   });
+
+  await expect(page.getByRole('button', { name: 'Update' }).first()).toBeVisible();
 
   // Find the mode select (shows "Custom duration") and change to "Never expires".
   const modeTrigger = page.getByTestId('envelope-expiration-mode');
-  await expect(modeTrigger).toBeVisible();
-
   await modeTrigger.click();
   await page.getByRole('option', { name: 'Never expires' }).click();
 
-  await page.getByRole('button', { name: 'Save changes' }).first().click();
-  await expect(page.getByText('Your reminder preferences have been updated').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
   // Verify via database.
   const orgSettings = await prisma.organisationGlobalSettings.findUniqueOrThrow({
@@ -106,8 +106,10 @@ test('[ENVELOPE_EXPIRATION]: team overrides organisation expiration', async ({ p
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/settings/reminders`,
+    redirectPath: `/t/${team.url}/settings/document`,
   });
+
+  await expect(page.getByRole('button', { name: 'Update' }).first()).toBeVisible();
 
   // The expiration picker mode select should show "Inherit from organisation" by default.
   const modeTrigger = page.getByTestId('envelope-expiration-mode');
@@ -126,8 +128,8 @@ test('[ENVELOPE_EXPIRATION]: team overrides organisation expiration', async ({ p
   await unitTrigger.click();
   await page.getByRole('option', { name: 'Days' }).click();
 
-  await page.getByRole('button', { name: 'Save changes' }).first().click();
-  await expect(page.getByText('Your reminder preferences have been updated').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
   // Verify team setting is overridden.
   const teamSettings = await getTeamSettings({ teamId: team.id });

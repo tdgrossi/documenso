@@ -23,7 +23,6 @@ export const findDocumentsInternalRoute = authenticatedProcedure
       orderByColumn,
       source,
       status,
-      hasExpiredRecipients,
       period,
       senderIds,
       folderId,
@@ -50,7 +49,6 @@ export const findDocumentsInternalRoute = authenticatedProcedure
         period,
         senderIds,
         folderId,
-        hasExpiredRecipients,
         orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
       }),
     ]);

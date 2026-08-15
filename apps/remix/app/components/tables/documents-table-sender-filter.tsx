@@ -1,61 +1,63 @@
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { trpc } from '@documenso/trpc/react';
+import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { UserIcon } from 'lucide-react';
-import { useQueryStates } from 'nuqs';
-
-import { FilterPill } from '~/components/general/filter-pill';
-import { documentsSearchParams } from '~/utils/documents-search-params';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 type DocumentsTableSenderFilterProps = {
   teamId: number;
 };
 
 export const DocumentsTableSenderFilter = ({ teamId }: DocumentsTableSenderFilterProps) => {
-  const { _ } = useLingui();
+  const { pathname } = useLocation();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const isMounted = useIsMounted();
 
-  const [{ senderIds }, setSearchParams] = useQueryStates(
-    {
-      senderIds: documentsSearchParams.senderIds,
-      page: documentsSearchParams.page,
-    },
-    { history: 'push' },
-  );
-
-  const selectedSenderIds = (senderIds ?? []).map((senderId) => senderId.toString());
+  const senderIds = (searchParams?.get('senderIds') ?? '').split(',').filter((value) => value !== '');
 
   const { data, isLoading } = trpc.team.member.getMany.useQuery({
     teamId,
   });
 
-  const options = (data ?? []).map((member) => ({
+  const comboBoxOptions = (data ?? []).map((member) => ({
     label: member.name ?? member.email,
     value: member.userId.toString(),
   }));
 
   const onChange = (newSenderIds: string[]) => {
-    void setSearchParams({
-      senderIds: newSenderIds.length > 0 ? newSenderIds.map(Number) : null,
-      page: null,
-    });
+    if (!pathname) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams?.toString());
+
+    params.set('senderIds', newSenderIds.join(','));
+
+    if (newSenderIds.length === 0) {
+      params.delete('senderIds');
+    }
+
+    void navigate(`${pathname}?${params.toString()}`, { preventScrollReset: true });
   };
 
   return (
-    <FilterPill
-      multiple
-      icon={UserIcon}
-      label={<Trans>Sender</Trans>}
-      value={selectedSenderIds}
-      onChange={onChange}
-      options={options}
-      enableSearch
-      searchPlaceholder={_(msg`Search members...`)}
+    <MultiSelectCombobox
+      emptySelectionPlaceholder={
+        <p className="font-normal text-muted-foreground">
+          <Trans>
+            <span className="text-muted-foreground/70">Sender:</span> All
+          </Trans>
+        </p>
+      }
+      enableClearAllButton={true}
+      inputPlaceholder={msg`Search`}
       loading={!isMounted || isLoading}
-      testId="documents-table-sender-filter"
+      options={comboBoxOptions}
+      selectedValues={senderIds}
+      onChange={onChange}
     />
   );
 };

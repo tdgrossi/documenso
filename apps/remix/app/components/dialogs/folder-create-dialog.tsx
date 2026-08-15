@@ -1,4 +1,3 @@
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -24,7 +23,7 @@ import { useParams } from 'react-router';
 import { z } from 'zod';
 
 const ZCreateFolderFormSchema = z.object({
-  name: ZNameSchema,
+  name: z.string().min(1, { message: 'Folder name is required' }),
 });
 
 type TCreateFolderFormSchema = z.infer<typeof ZCreateFolderFormSchema>;
@@ -66,7 +65,7 @@ export const FolderCreateDialog = ({ type, trigger, parentFolderId, ...props }: 
       toast({
         description: t`Folder created successfully`,
       });
-    } catch (_err) {
+    } catch (err) {
       toast({
         title: t`Failed to create folder`,
         description: t`An unknown error occurred while creating the folder.`,

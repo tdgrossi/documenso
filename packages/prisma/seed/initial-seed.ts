@@ -361,9 +361,9 @@ export const seedAlignmentTestDocument = async ({
   const { id, recipients, envelopeItems } = createdEnvelope;
 
   if (isDirectTemplate) {
-    const directTemplateRecipient = recipients.find((recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL);
+    const directTemplateRecpient = recipients.find((recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL);
 
-    if (!directTemplateRecipient) {
+    if (!directTemplateRecpient) {
       throw new Error('Need to create a direct template recipient');
     }
 
@@ -372,7 +372,7 @@ export const seedAlignmentTestDocument = async ({
         envelopeId: id,
         enabled: true,
         token: directTemplateToken ?? Math.random().toString(),
-        directTemplateRecipientId: directTemplateRecipient.id,
+        directTemplateRecipientId: directTemplateRecpient.id,
       },
     });
   }

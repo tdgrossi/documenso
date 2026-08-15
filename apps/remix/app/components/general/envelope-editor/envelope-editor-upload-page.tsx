@@ -26,7 +26,6 @@ import { ErrorCode as DropzoneErrorCode, type FileRejection, useDropzone } from 
 
 import { EnvelopeItemDeleteDialog } from '~/components/dialogs/envelope-item-delete-dialog';
 
-import { EnvelopeEditorInvalidDirectTemplateAlert } from './envelope-editor-invalid-direct-template-alert';
 import { EnvelopeEditorRecipientForm } from './envelope-editor-recipient-form';
 import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 
@@ -450,9 +449,6 @@ export const EnvelopeEditorUploadPage = () => {
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-8">
       <input {...getReplaceInputProps()} />
-
-      <EnvelopeEditorInvalidDirectTemplateAlert className="max-w-none" />
-
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">
           <CardTitle>

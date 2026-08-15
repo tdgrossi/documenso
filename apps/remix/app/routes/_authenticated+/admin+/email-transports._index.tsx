@@ -40,7 +40,7 @@ export default function AdminEmailTransportsPage() {
 
   return (
     <div>
-      <SettingsHeader hideDivider title={t`Email Transports`} subtitle={t`Manage all email transports`}>
+      <SettingsHeader title={t`Email Transports`} subtitle={t`Manage all email transports`} hideDivider>
         <EmailTransportCreateDialog />
       </SettingsHeader>
 

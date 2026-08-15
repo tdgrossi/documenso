@@ -1,4 +1,3 @@
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -30,7 +29,7 @@ export type SettingsSecurityPasskeyTableActionsProps = {
 };
 
 const ZUpdatePasskeySchema = z.object({
-  name: ZNameSchema,
+  name: z.string(),
 });
 
 type TUpdatePasskeySchema = z.infer<typeof ZUpdatePasskeySchema>;

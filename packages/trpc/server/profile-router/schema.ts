@@ -1,4 +1,4 @@
-import { ZNameSchema } from '@documenso/lib/types/name';
+import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { z } from 'zod';
 
 export const ZFindUserSecurityAuditLogsSchema = z.object({

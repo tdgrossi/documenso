@@ -3,7 +3,6 @@ import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/org
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { ZNameSchema } from '@documenso/lib/types/name';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindOrganisationGroupsResponse } from '@documenso/trpc/server/organisation-router/find-organisation-groups.types';
 import { Button } from '@documenso/ui/primitives/button';
@@ -29,6 +28,7 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import { z } from 'zod';
+
 import { OrganisationGroupDeleteDialog } from '~/components/dialogs/organisation-group-delete-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import {
@@ -36,6 +36,7 @@ import {
   OrganisationMembersMultiSelectCombobox,
 } from '~/components/general/organisation-members-multiselect-combobox';
 import { SettingsHeader } from '~/components/general/settings-header';
+
 import type { Route } from './+types/o.$orgUrl.settings.groups.$id';
 
 export default function OrganisationGroupSettingsPage({ params }: Route.ComponentProps) {
@@ -94,11 +95,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 
   return (
     <div>
-      <SettingsHeader
-        hideDivider
-        title={t`Organisation Group Settings`}
-        subtitle={t`Manage your organisation group settings.`}
-      >
+      <SettingsHeader title={t`Organisation Group Settings`} subtitle={t`Manage your organisation group settings.`}>
         <OrganisationGroupDeleteDialog
           organisationGroupId={groupId}
           organisationGroupName={group.name || ''}
@@ -116,7 +113,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
 }
 
 const ZUpdateOrganisationGroupFormSchema = z.object({
-  name: ZNameSchema,
+  name: z.string().min(1, msg`Name is required`.id),
   organisationRole: z.nativeEnum(OrganisationMemberRole),
   memberIds: z.array(z.string()),
 });

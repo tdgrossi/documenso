@@ -6,20 +6,22 @@ import { resolveNextReminderAt, ZEnvelopeReminderSettings } from '../../constant
 /**
  * Compute and store `nextReminderAt` for a single recipient.
  *
- * Pass `resetReminderCount: true` to restart the reminder cycle (e.g. on a
- * manual resend): the count is zeroed and the schedule recomputed as if the
- * request was freshly sent at `sentAt`.
+ * Call this after:
+ * - Sending the signing email (sentAt is set)
+ * - Sending a reminder (lastReminderSentAt is updated)
+ *
+ * If `reminderSettings` is provided it's used directly, avoiding a query.
+ * Otherwise it's read from the envelope's documentMeta (already resolved
+ * from the org/team cascade at envelope creation time).
  */
 export const updateRecipientNextReminder = async (options: {
   recipientId: number;
   envelopeId: string;
   sentAt: Date;
   lastReminderSentAt: Date | null;
-  reminderCount?: number;
-  resetReminderCount?: boolean;
   reminderSettings?: ReturnType<typeof ZEnvelopeReminderSettings.parse> | null;
 }) => {
-  const { recipientId, envelopeId, sentAt, lastReminderSentAt, reminderCount = 0, resetReminderCount } = options;
+  const { recipientId, envelopeId, sentAt, lastReminderSentAt } = options;
 
   let settings = options.reminderSettings;
 
@@ -38,15 +40,11 @@ export const updateRecipientNextReminder = async (options: {
     config: settings,
     sentAt,
     lastReminderSentAt,
-    reminderCount: resetReminderCount ? 0 : reminderCount,
   });
 
   await prisma.recipient.update({
     where: { id: recipientId },
-    data: {
-      nextReminderAt,
-      ...(resetReminderCount ? { reminderCount: 0 } : {}),
-    },
+    data: { nextReminderAt },
   });
 };
 
@@ -84,7 +82,7 @@ export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
       // Don't reschedule reminders for recipients whose deadline has passed.
       OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
     },
-    select: { id: true, sentAt: true, lastReminderSentAt: true, reminderCount: true },
+    select: { id: true, sentAt: true, lastReminderSentAt: true },
   });
 
   await Promise.all(
@@ -97,7 +95,6 @@ export const recomputeNextReminderForEnvelope = async (envelopeId: string) => {
         config: settings,
         sentAt: recipient.sentAt,
         lastReminderSentAt: recipient.lastReminderSentAt,
-        reminderCount: recipient.reminderCount,
       });
 
       await prisma.recipient.update({

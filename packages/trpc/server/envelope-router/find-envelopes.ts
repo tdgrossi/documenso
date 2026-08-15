@@ -10,19 +10,7 @@ export const findEnvelopesRoute = authenticatedProcedure
   .query(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
 
-    const {
-      query,
-      type,
-      templateId,
-      page,
-      perPage,
-      orderByDirection,
-      orderByColumn,
-      source,
-      status,
-      hasExpiredRecipients,
-      folderId,
-    } = input;
+    const { query, type, templateId, page, perPage, orderByDirection, orderByColumn, source, status, folderId } = input;
 
     ctx.logger.info({
       input: {
@@ -31,7 +19,6 @@ export const findEnvelopesRoute = authenticatedProcedure
         templateId,
         source,
         status,
-        hasExpiredRecipients,
         folderId,
         page,
         perPage,
@@ -46,7 +33,6 @@ export const findEnvelopesRoute = authenticatedProcedure
       query,
       source,
       status,
-      hasExpiredRecipients,
       page,
       perPage,
       folderId,

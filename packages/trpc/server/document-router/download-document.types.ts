@@ -7,10 +7,7 @@ export const downloadDocumentMeta: TrpcRouteMeta = {
     method: 'GET',
     path: '/document/{documentId}/download',
     summary: 'Download document',
-    description:
-      'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide.',
     tags: ['Document'],
-    deprecated: true,
     responseHeaders: z.object({
       'Content-Type': z.literal('application/pdf'),
     }),

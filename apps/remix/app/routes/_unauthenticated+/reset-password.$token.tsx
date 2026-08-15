@@ -1,4 +1,3 @@
-import { isSigninEnabledForProvider } from '@documenso/lib/constants/auth';
 import { getResetTokenValidity } from '@documenso/lib/server-only/user/get-reset-token-validity';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
@@ -14,10 +13,6 @@ export function meta() {
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
-  if (!isSigninEnabledForProvider('email')) {
-    throw redirect('/signin');
-  }
-
   const { token } = params;
 
   const isValid = await getResetTokenValidity({ token });

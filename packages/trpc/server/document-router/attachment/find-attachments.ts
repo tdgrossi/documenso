@@ -12,10 +12,8 @@ export const findAttachmentsRoute = authenticatedProcedure
       method: 'GET',
       path: '/document/attachment',
       summary: 'Find attachments',
-      description:
-        'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Find all attachments for a document',
+      description: 'Find all attachments for a document',
       tags: ['Document'],
-      deprecated: true,
     },
   })
   .input(ZFindAttachmentsRequestSchema)

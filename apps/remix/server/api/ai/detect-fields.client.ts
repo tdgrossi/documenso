@@ -1,4 +1,3 @@
-import { formatPath } from '@documenso/lib/constants/app';
 import { z } from 'zod';
 
 import { type TDetectFieldsRequest, ZNormalizedFieldWithContextSchema } from './detect-fields.types';
@@ -70,7 +69,7 @@ export const detectFields = async ({
   onError,
   signal,
 }: DetectFieldsOptions): Promise<void> => {
-  const response = await fetch(formatPath('/api/ai/detect-fields'), {
+  const response = await fetch('/api/ai/detect-fields', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

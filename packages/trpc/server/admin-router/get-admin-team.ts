@@ -30,7 +30,6 @@ export const getAdminTeamRoute = adminProcedure
             name: true,
             url: true,
             ownerUserId: true,
-            organisationGlobalSettings: true,
           },
         },
         teamEmail: true,

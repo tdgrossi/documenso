@@ -8,7 +8,6 @@
     "teams",
     "rate-limits",
     "versioning",
-    "migrate-to-envelopes",
     "developer-mode",
     "common-errors"
   ]

@@ -12,10 +12,8 @@ export const createAttachmentRoute = authenticatedProcedure
       method: 'POST',
       path: '/document/attachment/create',
       summary: 'Create attachment',
-      description:
-        'Deprecated: this endpoint is being replaced by the Envelope API. See https://docs.documenso.com/docs/developers/api/migrate-to-envelopes for the migration guide. Create a new attachment for a document',
+      description: 'Create a new attachment for a document',
       tags: ['Document'],
-      deprecated: true,
     },
   })
   .input(ZCreateAttachmentRequestSchema)

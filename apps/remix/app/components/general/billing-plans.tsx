@@ -317,6 +317,7 @@ export const IndividualPersonalLayoutCheckoutButton = ({
       const createSubscriptionResponse = await createSubscription({
         organisationId: organisations[0].id,
         priceId,
+        isPersonalLayoutMode: true,
       });
 
       window.location.href = createSubscriptionResponse.redirectUrl;

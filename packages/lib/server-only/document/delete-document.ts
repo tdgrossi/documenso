@@ -1,9 +1,13 @@
+import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
 import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, RecipientRole, SendStatus, WebhookTriggerEvents } from '@prisma/client';
+import { createElement } from 'react';
 
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { jobs } from '../../jobs/client';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { mapEnvelopeToWebhookDocumentPayload, ZWebhookDocumentSchema } from '../../types/webhook-payload';
@@ -12,8 +16,9 @@ import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { type EnvelopeIdOptions, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { isRecipientEmailValidForSending } from '../../utils/recipients';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { getMemberRoles } from '../team/get-member-roles';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type DeleteDocumentOptions = {
@@ -36,9 +41,7 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
     });
   }
 
-  // Note: This is an unsafe request. It is used purely to resolve the recipient
-  // self-hide path below. The authoritative delete authorization is performed
-  // via the visibility-aware `getEnvelopeWhereInput` helper.
+  // Note: This is an unsafe request, we validate the ownership later in the function.
   const envelope = await prisma.envelope.findUnique({
     where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
     include: {
@@ -53,47 +56,36 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
     });
   }
 
-  // Determine whether the user has authorized delete access using the
-  // visibility-aware helper. This enforces ownership OR (team membership AND
-  // the document's visibility is permitted for the member's role) OR team-email
-  // access. A bare team member without sufficient visibility will resolve to
-  // null here and therefore must not be able to delete the document.
-  const hasDeleteAccess = await getEnvelopeWhereInput({
-    id,
-    userId,
-    teamId,
-    type: EnvelopeType.DOCUMENT,
+  const isUserTeamMember = await getMemberRoles({
+    teamId: envelope.teamId,
+    reference: {
+      type: 'User',
+      id: userId,
+    },
   })
-    .then(({ envelopeWhereInput }) =>
-      prisma.envelope.findFirst({
-        where: envelopeWhereInput,
-        select: { id: true },
-      }),
-    )
-    .then((result) => Boolean(result))
+    .then(() => true)
     .catch(() => false);
 
+  const isUserOwner = envelope.userId === userId;
   const userRecipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
-  if (!hasDeleteAccess && !userRecipient) {
+  if (!isUserOwner && !isUserTeamMember && !userRecipient) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Not allowed',
     });
   }
 
   // Handle hard or soft deleting the actual document if user has permission.
-  if (hasDeleteAccess) {
-    const updatedEnvelope = await handleDocumentOwnerDelete({
+  if (isUserOwner || isUserTeamMember) {
+    await handleDocumentOwnerDelete({
       envelope,
       user,
       requestMetadata,
     });
 
-    const envelopeForWebhook = { ...envelope, ...(updatedEnvelope ?? {}) };
-
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
-      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelopeForWebhook)),
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
       userId,
       teamId,
     });
@@ -133,7 +125,7 @@ const handleDocumentOwnerDelete = async ({ envelope, user, requestMetadata }: Ha
     return;
   }
 
-  const { emailLanguage, emailsDisabled } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail, emailsDisabled, emailTransport } = await getEmailContext({
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
@@ -200,40 +192,50 @@ const handleDocumentOwnerDelete = async ({ envelope, user, requestMetadata }: Ha
     return deletedEnvelope;
   }
 
-  // Enqueue cancellation emails as a background job. The envelope (and its
-  // documentMeta) is hard-deleted above, so the job can't look it up later —
-  // pass a self-contained payload with the recipients to notify.
-  const recipientsToNotify = envelope.recipients
-    .filter(
-      (recipient) =>
-        recipient.sendStatus === SendStatus.SENT &&
-        recipient.role !== RecipientRole.CC &&
-        isRecipientEmailValidForSending(recipient),
-    )
-    .map((recipient) => ({
-      email: recipient.email,
-      name: recipient.name,
-    }));
+  // Send cancellation emails to recipients.
+  await Promise.all(
+    envelope.recipients.map(async (recipient) => {
+      if (
+        recipient.sendStatus !== SendStatus.SENT ||
+        !isRecipientEmailValidForSending(recipient) ||
+        recipient.role === RecipientRole.CC
+      ) {
+        return;
+      }
 
-  if (recipientsToNotify.length > 0) {
-    await jobs.triggerJob({
-      name: 'send.document.deleted.emails',
-      payload: {
-        teamId: envelope.teamId,
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+
+      const template = createElement(DocumentCancelTemplate, {
         documentName: envelope.title,
         inviterName: user.name || undefined,
         inviterEmail: user.email,
-        meta: envelope.documentMeta
-          ? {
-              emailId: envelope.documentMeta.emailId,
-              emailReplyTo: envelope.documentMeta.emailReplyTo,
-              language: emailLanguage,
-            }
-          : null,
-        recipients: recipientsToNotify,
-      },
-    });
-  }
+        assetBaseUrl,
+      });
+
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+        renderEmailWithI18N(template, {
+          lang: emailLanguage,
+          branding,
+          plainText: true,
+        }),
+      ]);
+
+      const i18n = await getI18nInstance(emailLanguage);
+
+      await emailTransport.sendMail({
+        to: {
+          address: recipient.email,
+          name: recipient.name,
+        },
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: i18n._(msg`Document Cancelled`),
+        html,
+        text,
+      });
+    }),
+  );
 
   return deletedEnvelope;
 };

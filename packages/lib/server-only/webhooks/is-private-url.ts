@@ -3,11 +3,10 @@ import { z } from 'zod';
 const ZIpSchema = z.string().ip();
 
 /**
- * Synchronously check whether a URL's host is a known private/loopback address
- * (localhost, RFC 1918, link-local, loopback, etc.), regardless of protocol.
+ * Check whether a URL points to a known private/loopback address.
  *
- * Best-effort and non-exhaustive: unrecognised or unparseable hosts return
- * `false` (fail open). See `assertNotPrivateUrl` for the full SSRF caveats.
+ * Performs a synchronous check against known private hostnames and IP ranges.
+ * Works regardless of the URL protocol.
  */
 export const isPrivateUrl = (url: string): boolean => {
   try {
